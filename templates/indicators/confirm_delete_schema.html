@@ -347,13 +347,13 @@
                     </span>
                 </div>
                 
-                {% if indicators %}
+                {% if schema.indicators.all %}
                     <div class="indicators-list">
                         <div class="detail-item">
                             <span class="detail-label">Индикаторы:</span>
-                            <span class="detail-value"><strong>{{ indicators|length }} индикатор(ов)</strong></span>
+                            <span class="detail-value"><strong>{{ indicator_count }} индикатор(ов)</strong></span>
                         </div>
-                        {% for indicator in indicators %}
+                        {% for indicator in schema.indicators.all %}
                             <div class="indicator-item">
                                 <span class="indicator-name">{{ indicator.name }}</span>
                             </div>
@@ -367,14 +367,14 @@
                 {% endif %}
             </div>
             
-            {% if indicators %}
+            {% if indicator_count > 0 %}
                 <div class="warning-box">
                     <div class="warning-content">
                         <h3 class="warning-title">Что будет удалено:</h3>
                         <p class="warning-text">
                             • Схема "{{ schema.name }}"<br>
-                            • {{ indicators|length }} связанных индикатор(ов)<br>
-                            • Все измерения пациентов по этим индикаторам<br>
+                            • {{ indicator_count }} связанных индикатор(ов)<br>
+                            • {{ measurement_count }} измерений пациентов по этим индикаторам<br>
                             • Все настройки диапазонов оценки<br>
                             • Вся история данных
                         </p>
