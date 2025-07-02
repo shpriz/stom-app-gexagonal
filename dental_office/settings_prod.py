@@ -127,7 +127,7 @@ LOGOUT_REDIRECT_URL = '/auth/login/'
 # Session Security Settings for Production
 SESSION_COOKIE_AGE = 60 * 60 * 8  # 8 hours
 SESSION_EXPIRE_AT_BROWSER_CLOSE = True
-SESSION_COOKIE_SECURE = True  # HTTPS only in production
+SESSION_COOKIE_SECURE = False  # Set to False for HTTP
 SESSION_COOKIE_HTTPONLY = True  # Prevent JavaScript access
 SESSION_COOKIE_SAMESITE = 'Lax'  # CSRF protection
 SESSION_SAVE_EVERY_REQUEST = True  # Update session on every request
@@ -142,9 +142,10 @@ SECURE_SSL_REDIRECT = config('SECURE_SSL_REDIRECT', default=False, cast=bool)
 X_FRAME_OPTIONS = 'DENY'  # Prevent clickjacking
 
 # CSRF Settings
-CSRF_COOKIE_SECURE = True
-CSRF_COOKIE_HTTPONLY = True
+CSRF_COOKIE_SECURE = False  # Set to False for HTTP
+CSRF_COOKIE_HTTPONLY = False  # Allow JavaScript access for AJAX
 CSRF_TRUSTED_ORIGINS = config('CSRF_TRUSTED_ORIGINS', default='', cast=lambda v: [s.strip() for s in v.split(',')] if v else [])
+CSRF_COOKIE_SAMESITE = 'Lax'  # Allow cross-site requests
 
 # REST Framework
 REST_FRAMEWORK = {
