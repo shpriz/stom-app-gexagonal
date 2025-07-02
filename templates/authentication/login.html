@@ -28,6 +28,8 @@
                        class="form-control"
                        required 
                        autofocus
+                       autocomplete="username"
+                       tabindex="1"
                        placeholder="Введите имя пользователя">
             </div>
             
@@ -38,6 +40,8 @@
                        name="password" 
                        class="form-control" 
                        required
+                       autocomplete="current-password"
+                       tabindex="2"
                        placeholder="Введите пароль">
             </div>
             
@@ -49,5 +53,36 @@
         </form>
 
     </div>
+
+    <script>
+        // Debug script to ensure inputs are working
+        document.addEventListener('DOMContentLoaded', function() {
+            const usernameInput = document.getElementById('username');
+            const passwordInput = document.getElementById('password');
+            
+            // Ensure inputs are focusable and enabled
+            if (usernameInput) {
+                usernameInput.removeAttribute('disabled');
+                usernameInput.removeAttribute('readonly');
+                usernameInput.style.pointerEvents = 'auto';
+                
+                // Auto-focus on username field
+                setTimeout(() => {
+                    usernameInput.focus();
+                }, 100);
+                
+                // Debug logging
+                usernameInput.addEventListener('input', function(e) {
+                    console.log('Username input working:', e.target.value);
+                });
+            }
+            
+            if (passwordInput) {
+                passwordInput.removeAttribute('disabled');
+                passwordInput.removeAttribute('readonly');
+                passwordInput.style.pointerEvents = 'auto';
+            }
+        });
+    </script>
 </body>
 </html>
