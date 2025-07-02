@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>📋 {% if is_edit %}Редактировать измерение{% else %}Добавить измерение{% endif %} - {{ patient.full_name }}</title>
+    <link rel="stylesheet" href="/static/css/friendly-styles.css">
+</head>
+<body>
+    <!-- Header Navigation -->
+    <header class="page-header">
+        <h1 class="page-title">📋 {% if is_edit %}Редактировать измерение{% else %}Добавить измерение{% endif %}</h1>
+        <p class="page-subtitle">{{ patient.full_name }} - Ввод медицинских показателей</p>
+        
+        <nav class="nav-bar mt-20">
+            <a href="/" class="nav-link">🏠 Панель управления</a>
+            <a href="/patients/" class="nav-link">👥 Все пациенты</a>
+            <a href="/chart/{{ patient.id }}/" class="nav-link">📊 Диаграмма</a>
+            <a href="/indicators/" class="nav-link">⚙️ Настройки</a>
+        </nav>
+    </header>
+
+    <div class="main-container">
+        <!-- Messages Section -->
+        {% include 'components/messages.html' %}
+
+        <!-- Form Content -->
+        <div class="form-container fade-in-up">
+            
+            {% if form.errors %}
+                <div class="error-container">
+                    <strong>❌ Пожалуйста, исправьте следующие ошибки:</strong>
+                    <ul>
+                        {% for field, errors in form.errors.items %}
+                            {% for error in errors %}
+                                <li>{{ field }}: {{ error }}</li>
+                            {% endfor %}
+                        {% endfor %}
+                    </ul>
+                </div>
+            {% endif %}
+            
+            <form method="post">
+                {% csrf_token %}
+                
+                {{ form.patient }}
+                
+                <div class="form-group">
+                    <label for="{{ form.schema.id_for_label }}" class="form-label">
+                        Схема измерения <span class="required-indicator">*</span>
+                    </label>
+                    {{ form.schema }}
+                    {% if form.schema.help_text %}
+                        <div class="form-help">💡 {{ form.schema.help_text }}</div>
+                    {% endif %}
+                </div>
+                
+                <div class="form-group">
+                    <label for="{{ form.measurement_date.id_for_label }}" class="form-label">
+                        Дата и время измерения <span class="required-indicator">*</span>
+                    </label>
+                    {{ form.measurement_date }}
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">
+                        {{ form.show_in_chart }}
+                        📊 Показывать на радарной диаграмме
+                    </label>
+                </div>
+                
+                <div class="indicators-section">
+                    <h3>Значения индикаторов</h3>
+                    <div class="indicators-grid">
+                        <!-- Left Column -->
+                        <div class="indicators-column">
+                            <div class="indicator-header">
+                                <div>🎯 Показатель</div>
+                                <div>📊 Значение</div>
+                                <div>⭐ Баллы</div>
+                            </div>
+                            
+                            {% for item in indicator_fields|slice:":3" %}
+                                <div class="indicator-item">
+                                    <div class="indicator-name">
+                                        <strong>{{ item.indicator.name }}</strong>
+                                        {% if item.indicator.description %}
+                                            <div class="indicator-description">
+                                                {{ item.indicator.description }}
+                                            </div>
+                                        {% endif %}
+                                    </div>
+                                    
+                                    <div class="indicator-input">
+                                        {{ item.field }}
+                                    </div>
+                                    
+                                    <div class="score-display" id="score_{{ item.indicator.id }}">
+                                        <span class="score-value">0</span>
+                                        <span class="score-label">баллов</span>
+                                    </div>
+                                </div>
+                            {% endfor %}
+                        </div>
+                        
+                        <!-- Right Column -->
+                        <div class="indicators-column">
+                            <div class="indicator-header">
+                                <div>🎯 Показатель</div>
+                                <div>📊 Значение</div>
+                                <div>⭐ Баллы</div>
+                            </div>
+                            
+                            {% for item in indicator_fields|slice:"3:" %}
+                                <div class="indicator-item">
+                                    <div class="indicator-name">
+                                        <strong>{{ item.indicator.name }}</strong>
+                                        {% if item.indicator.description %}
+                                            <div class="indicator-description">
+                                                {{ item.indicator.description }}
+                                            </div>
+                                        {% endif %}
+                                    </div>
+                                    
+                                    <div class="indicator-input">
+                                        {{ item.field }}
+                                    </div>
+                                    
+                                    <div class="score-display" id="score_{{ item.indicator.id }}">
+                                        <span class="score-value">0</span>
+                                        <span class="score-label">баллов</span>
+                                    </div>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="{{ form.notes.id_for_label }}" class="form-label">📝 Заметки</label>
+                    {{ form.notes }}
+                </div>
+                
+                <div class="measurement-form-actions">
+                    <button type="submit" class="btn btn-primary btn-lg">
+                        {% if is_edit %}✅ Обновить измерение{% else %}✅ Сохранить измерение{% endif %}
+                    </button>
+                    <a href="/chart/{{ patient.id }}/" class="btn btn-warning btn-lg">
+                        ❌ Отмена
+                    </a>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        // Cache for scoring ranges to avoid repeated API calls
+        const scoringRangesCache = {};
+        
+        async function calculateScore(input) {
+            const value = parseFloat(input.value);
+            const indicatorId = input.getAttribute('data-indicator-id');
+            const scoreDisplay = document.getElementById('score_' + indicatorId);
+            
+            if (isNaN(value) || value === '') {
+                scoreDisplay.classList.remove('visible');
+                scoreDisplay.querySelector('.score-value').textContent = '0';
+                return;
+            }
+            
+            try {
+                // Get scoring ranges for this indicator
+                let ranges = scoringRangesCache[indicatorId];
+                if (!ranges) {
+                    const response = await fetch(`/api/measurements/scoring_ranges/?indicator_id=${indicatorId}`);
+                    const data = await response.json();
+                    ranges = data.ranges || [];
+                    scoringRangesCache[indicatorId] = ranges;
+                }
+                
+                // Calculate score based on ranges
+                let score = 0;
+                for (const range of ranges) {
+                    if (isValueInRange(value, range)) {
+                        score = range.score;
+                        break;
+                    }
+                }
+                
+                scoreDisplay.querySelector('.score-value').textContent = score;
+                scoreDisplay.classList.add('visible');
+                
+                // Add visual feedback
+                if (score > 0) {
+                    input.style.borderColor = '#28a745';
+                    input.style.backgroundColor = '#f8fff9';
+                } else {
+                    input.style.borderColor = '#667eea';
+                    input.style.backgroundColor = '#f8f9ff';
+                }
+                
+            } catch (error) {
+                console.error('Error calculating score:', error);
+                scoreDisplay.classList.remove('visible');
+            }
+        }
+        
+        function isValueInRange(value, range) {
+            // Exact value match takes priority
+            if (range.exact_value !== null) {
+                return Math.abs(value - range.exact_value) < 0.001;
+            }
+            
+            // Special cases
+            if (range.is_greater_than_or_equal && range.min_value !== null) {
+                return value >= range.min_value;
+            }
+            
+            if (range.is_less_than && range.max_value !== null) {
+                return value < range.max_value;
+            }
+            
+            // Normal range check
+            const minOk = range.min_value === null || value >= range.min_value;
+            const maxOk = range.max_value === null || value <= range.max_value;
+            
+            return minOk && maxOk;
+        }
+        
+        // Schema switching functionality
+        document.addEventListener('DOMContentLoaded', function() {
+            const schemaSelector = document.getElementById('schema-selector') || document.getElementById('id_schema');
+            
+            if (schemaSelector) {
+                schemaSelector.addEventListener('change', function() {
+                    const selectedSchemaId = this.value;
+                    if (selectedSchemaId) {
+                        // Reload the page with the selected schema
+                        const currentUrl = new URL(window.location);
+                        currentUrl.searchParams.set('schema', selectedSchemaId);
+                        window.location.href = currentUrl.toString();
+                    }
+                });
+            }
+
+            // Add hover animations to indicator items
+            const indicatorItems = document.querySelectorAll('.indicator-item');
+            indicatorItems.forEach((item, index) => {
+                // Staggered animation
+                item.style.animationDelay = `${index * 0.1}s`;
+                item.classList.add('fade-in-up');
+            });
+
+            // Initialize all score displays
+            const inputs = document.querySelectorAll('.indicator-input .form-control');
+            inputs.forEach(input => {
+                if (input.value) {
+                    calculateScore(input);
+                }
+            });
+        });
+    </script>
+</body>
+</html>

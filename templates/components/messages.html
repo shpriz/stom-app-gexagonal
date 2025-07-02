@@ -1,0 +1,101 @@
+{% if messages %}
+    {% for message in messages %}
+        <div class="alert alert-{{ message.tags|default:'info' }} alert-dismissible" 
+             data-message-type="{{ message.tags|default:'info' }}"
+             style="position: relative; 
+                    background: {% if message.tags == 'success' %}#d4edda; color: #155724; border: 1px solid #c3e6cb{% elif message.tags == 'error' %}#f8d7da; color: #721c24; border: 1px solid #f5c6cb{% elif message.tags == 'warning' %}#fff3cd; color: #856404; border: 1px solid #ffeaa7{% else %}#d1ecf1; color: #0c5460; border: 1px solid #bee5eb{% endif %}; 
+                    padding: 15px 45px 15px 15px; 
+                    border-radius: 6px; 
+                    margin-bottom: 20px;
+                    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+                    animation: slideIn 0.3s ease-out;">
+            
+            {% if message.tags == 'success' %}
+                <strong>✅ Success!</strong>
+            {% elif message.tags == 'error' %}
+                <strong>❌ Error!</strong>
+            {% elif message.tags == 'warning' %}
+                <strong>⚠️ Warning!</strong>
+            {% else %}
+                <strong>ℹ️ Info:</strong>
+            {% endif %}
+            {{ message }}
+            
+            <button type="button" 
+                    class="alert-close-btn" 
+                    onclick="dismissAlert(this)" 
+                    style="position: absolute; 
+                           top: 12px; 
+                           right: 15px; 
+                           background: none; 
+                           border: none; 
+                           font-size: 20px; 
+                           cursor: pointer; 
+                           color: inherit; 
+                           opacity: 0.7;
+                           width: 24px;
+                           height: 24px;
+                           display: flex;
+                           align-items: center;
+                           justify-content: center;"
+                    onmouseover="this.style.opacity='1'"
+                    onmouseout="this.style.opacity='0.7'"
+                    title="Dismiss">
+                &times;
+            </button>
+        </div>
+    {% endfor %}
+    
+    <style>
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        @keyframes fadeOut {
+            from {
+                opacity: 1;
+                transform: translateY(0);
+            }
+            to {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+        }
+        
+        .alert-dismissing {
+            animation: fadeOut 0.3s ease-out forwards;
+        }
+    </style>
+    
+    <script>
+        function dismissAlert(button) {
+            const alert = button.parentElement;
+            alert.classList.add('alert-dismissing');
+            setTimeout(() => {
+                alert.style.display = 'none';
+            }, 300);
+        }
+        
+        // Auto-dismiss success messages after 5 seconds
+        document.addEventListener('DOMContentLoaded', function() {
+            const successAlerts = document.querySelectorAll('.alert[data-message-type="success"]');
+            successAlerts.forEach(function(alert) {
+                setTimeout(function() {
+                    if (alert.style.display !== 'none') {
+                        const closeBtn = alert.querySelector('.alert-close-btn');
+                        if (closeBtn) {
+                            dismissAlert(closeBtn);
+                        }
+                    }
+                }, 5000); // Auto-dismiss after 5 seconds
+            });
+        });
+    </script>
+{% endif %}

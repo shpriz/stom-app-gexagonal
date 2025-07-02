@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Вход в систему - Стоматологическая клиника</title>
+    <link rel="stylesheet" href="/static/css/friendly-styles.css">
+</head>
+<body class="login-page">
+    <div class="login-container">
+        <div class="login-header">
+            <div class="clinic-logo">🦷</div>
+            <h1>Стоматологическая клиника</h1>
+        </div>
+
+        <!-- Messages Section -->
+        {% include 'components/messages.html' %}
+
+        <!-- Login Form -->
+        <form method="post" class="login-form">
+            {% csrf_token %}
+            
+            <div class="form-group">
+                <label for="username" class="form-label">👤 Имя пользователя</label>
+                <input type="text" 
+                       id="username" 
+                       name="username"
+                       class="form-control"
+                       required 
+                       autofocus
+                       placeholder="Введите имя пользователя">
+            </div>
+            
+            <div class="form-group">
+                <label for="password" class="form-label">🔒 Пароль</label>
+                <input type="password" 
+                       id="password" 
+                       name="password" 
+                       class="form-control" 
+                       required
+                       placeholder="Введите пароль">
+            </div>
+            
+            <div class="form-group">
+                <button type="submit" class="btn btn-primary btn-lg w-100">
+                    🔐 Войти в систему
+                </button>
+            </div>
+        </form>
+
+    </div>
+</body>
+</html>

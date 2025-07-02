@@ -1,0 +1,996 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>📊 Диаграмма - {{ patient.full_name }}</title>
+    <link rel="stylesheet" href="/static/css/friendly-styles.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
+    <style>
+        .charts-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        .schema-row {
+            display: flex;
+            margin-bottom: 40px;
+            gap: 20px;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+        
+        .chart-section {
+            flex: 2.5;
+            padding: 20px;
+            min-height: 600px;
+        }
+        
+        .recommendations-section {
+            flex: 1;
+            padding: 20px;
+            background: #f8f9fa;
+            border-left: 3px solid #dee2e6;
+        }
+        
+        .schema-title {
+            font-size: 18px;
+            font-weight: bold;
+            text-align: center;
+            margin-bottom: 15px;
+            color: #333;
+        }
+        
+        .hexagon-chart {
+            width: 100%;
+            height: 900px;
+            margin: 20px 0;
+        }
+        
+        .risk-score {
+            text-align: center;
+            margin: 15px 0;
+            padding: 10px;
+            border-radius: 8px;
+            font-weight: bold;
+        }
+        
+        .risk-low { background-color: #d4edda; color: #155724; }
+        .risk-moderate { background-color: #fff3cd; color: #856404; }
+        .risk-high { background-color: #f8d7da; color: #721c24; }
+        
+        .recommendations {
+            font-size: 14px;
+            line-height: 1.6;
+        }
+        
+        .recommendation-item {
+            margin-bottom: 15px;
+            padding: 10px;
+            background: white;
+            border-radius: 8px;
+            border-left: 4px solid #007bff;
+        }
+        
+        .recommendation-title {
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 5px;
+        }
+        
+        .chart-controls {
+            margin-bottom: 15px;
+            text-align: center;
+        }
+        
+        .measurement-selector {
+            margin: 3px;
+            padding: 8px 12px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            background: white;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
+            transition: all 0.2s ease;
+        }
+        
+        .measurement-selector:hover {
+            background: #e9ecef;
+            border-color: #007bff;
+        }
+        
+        .measurement-selector.selected {
+            background: #007bff;
+            color: white;
+            border-color: #0056b3;
+        }
+        
+        .measurement-selector input[type="checkbox"] {
+            margin-right: 8px;
+            transform: scale(1.2);
+        }
+    </style>
+</head>
+<body>
+    <!-- Header Navigation -->
+    <header class="page-header">
+        <h1 class="page-title">📊 Гексагональная диаграмма</h1>
+        <p class="page-subtitle">{{ patient.full_name }} - Анализ медицинских показателей по схемам</p>
+        
+        <nav class="nav-bar mt-20">
+            <a href="/" class="nav-link">🏠 Панель управления</a>
+            <a href="/patients/" class="nav-link">👥 Все пациенты</a>
+            <a href="/patient/edit/{{ patient.id }}/" class="nav-link">✏️ Редактировать</a>
+            <a href="/measurement/add/{{ patient.id }}/" class="nav-link">📋 Новое измерение</a>
+        </nav>
+    </header>
+
+    <div class="main-container">
+        {% include 'components/messages.html' %}
+        
+        <div class="charts-container" id="chartsContainer">
+            <!-- Schema charts will be generated here -->
+        </div>
+    </div>
+
+    <script>
+        const patientId = {{ patient_id }};
+        let schemasData = [];
+        let schemasMeanData = {};
+        
+        // Sample data structure based on your medical schemas
+        const sampleSchemas = [
+            {
+                id: 1,
+                name: "Схема 1 - Основные факторы риска",
+                indicators: [
+                    { name: "OHIP 14", value: 1, max: 2 },
+                    { name: "Длительность", value: 0, max: 2 },
+                    { name: "Курение", value: 2, max: 2 },
+                    { name: "Соматические заболевания", value: 1, max: 2 },
+                    { name: "Прием препаратов", value: 0, max: 2 },
+                    { name: "Комплаентность", value: 2, max: 2 }
+                ],
+                totalScore: 6,
+                maxScore: 12,
+                measurements: [
+                    { id: 1, date: "2024-01-15", data: [1,0,2,1,0,2] },
+                    { id: 2, date: "2024-01-20", data: [0,1,2,1,1,1] }
+                ]
+            },
+            {
+                id: 2,
+                name: "Схема 2 - Общая итоговая шкала",
+                indicators: [
+                    { name: "Индекс гигиены", value: 1, max: 2 },
+                    { name: "Подвижность зубов", value: 2, max: 2 },
+                    { name: "Кровоточивость", value: 1, max: 2 },
+                    { name: "Индекс CAL", value: 0, max: 2 },
+                    { name: "Индекс CPI", value: 1, max: 2 },
+                    { name: "Отсутствующие зубы", value: 2, max: 2 }
+                ],
+                totalScore: 7,
+                maxScore: 12,
+                measurements: [
+                    { id: 3, date: "2024-01-15", data: [1,2,1,0,1,2] },
+                    { id: 4, date: "2024-01-20", data: [0,1,0,1,1,1] }
+                ]
+            }
+        ];
+        
+        function calculateRiskLevel(totalScore, maxScore, schemaType) {
+            if (schemaType === 1) {
+                // Schema 1: 12-9 high, 8-5 moderate, 4 and below low
+                if (totalScore >= 9) return { level: 'high', text: 'Высокий риск', range: '12-9 баллов' };
+                if (totalScore >= 5) return { level: 'moderate', text: 'Умеренный риск', range: '8-5 баллов' };
+                return { level: 'low', text: 'Низкий риск', range: '4 балла и менее' };
+            } else {
+                // Schema 2: 24-18 high, 17-10 moderate, 9 and below low
+                if (totalScore >= 18) return { level: 'high', text: 'Высокий риск', range: '24-18 баллов' };
+                if (totalScore >= 10) return { level: 'moderate', text: 'Умеренный риск', range: '17-10 баллов' };
+                return { level: 'low', text: 'Низкий риск', range: '9 баллов и менее' };
+            }
+        }
+        
+        function getRecommendations(schema, riskLevel) {
+            const baseRecommendations = {
+                1: {
+                    "Курение": "Провести беседу с пациентом о вреде курения. Рекомендовать снизить количество сигарет или прекратить курение.",
+                    "Прием препаратов": "Рекомендовать пить больше воды, использовать увлажняющую зубную пасту и ополаскиватель для полости рта.",
+                    "Длительность": "Провести обучение индивидуальной гигиене рта. Проводить профилактические осмотры не реже 1 раза в 4 месяца.",
+                    "Комплаентность": "Провести беседу о необходимости соблюдения рекомендаций. Все рекомендации продублировать письменно.",
+                    "Соматические заболевания": "Направить к терапевту для уточнения патологии и направления к специалистам.",
+                    "OHIP 14": "Провести подробный анализ результатов анкетирования. Выявить факторы, снижающие качество жизни."
+                },
+                2: {
+                    "Индекс гигиены": "Провести профессиональную гигиену полости рта. Обучить индивидуальной гигиене по упрощенной программе.",
+                    "Подвижность зубов": "Полоскание хлоргексидином, аппликации геля. Шинирование зубов 2 степени подвижности.",
+                    "Кровоточивость": "Использовать противовоспалительные пасты и ополаскиватели. Аппликации геля для десен.",
+                    "Индекс CAL": "Комплексное лечение пародонтита. Направление к пародонтологу.",
+                    "Индекс CPI": "Профессиональная гигиена, противовоспалительная терапия.",
+                    "Отсутствующие зубы": "Направить к стоматологу-ортопеду для замещения дефектов зубных рядов."
+                }
+            };
+            
+            return baseRecommendations[schema.id] || {};
+        }
+        
+        function createHexagonChart(schema, containerId) {
+            const container = document.getElementById(containerId);
+            container.innerHTML = ''; // Clear previous chart
+            
+            const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+            svg.setAttribute("viewBox", "0 0 1400 1400");
+            svg.setAttribute("class", "hexagon-chart");
+            
+            const centerX = 700, centerY = 700, radius = 360;
+            const indicators = schema.indicators;
+            const numPoints = indicators.length;
+            
+            // Create background colored zones: 0=green, 1=yellow, 2=red
+            const zones = [
+                { value: 2, color: 'rgba(220, 53, 69, 0.15)', label: '2' },    // Red zone (outermost)
+                { value: 1, color: 'rgba(255, 193, 7, 0.15)', label: '1' },   // Yellow zone (middle)  
+                { value: 0, color: 'rgba(40, 167, 69, 0.15)', label: '0' }    // Green zone (innermost)
+            ];
+            
+            zones.forEach(zone => {
+                const zoneRadius = (radius / 2) * (zone.value + 1); // Scale 0-2 to radius
+                const path = document.createElementNS("http://www.w3.org/2000/svg", "path");
+                let pathData = "";
+                
+                for (let i = 0; i <= numPoints; i++) {
+                    const angle = (i * 2 * Math.PI / numPoints) - Math.PI / 2;
+                    const x = centerX + zoneRadius * Math.cos(angle);
+                    const y = centerY + zoneRadius * Math.sin(angle);
+                    pathData += (i === 0 ? "M" : "L") + x + "," + y;
+                }
+                pathData += "Z";
+                
+                path.setAttribute("d", pathData);
+                path.setAttribute("fill", zone.color);
+                path.setAttribute("stroke", "none");
+                svg.appendChild(path);
+            });
+            
+            // Create grid lines (0, 1, 2 rings)
+            for (let ring = 1; ring <= 2; ring++) {
+                const ringRadius = (radius / 2) * (ring + 1);
+                const path = document.createElementNS("http://www.w3.org/2000/svg", "path");
+                let pathData = "";
+                
+                for (let i = 0; i <= numPoints; i++) {
+                    const angle = (i * 2 * Math.PI / numPoints) - Math.PI / 2;
+                    const x = centerX + ringRadius * Math.cos(angle);
+                    const y = centerY + ringRadius * Math.sin(angle);
+                    pathData += (i === 0 ? "M" : "L") + x + "," + y;
+                }
+                pathData += "Z";
+                
+                path.setAttribute("d", pathData);
+                path.setAttribute("fill", "none");
+                path.setAttribute("stroke", "#666");
+                path.setAttribute("stroke-width", "1");
+                path.setAttribute("opacity", "0.3");
+                svg.appendChild(path);
+            }
+            
+            // Create grid lines from center to vertices
+            for (let i = 0; i < numPoints; i++) {
+                const angle = (i * 2 * Math.PI / numPoints) - Math.PI / 2;
+                const x = centerX + radius * Math.cos(angle);
+                const y = centerY + radius * Math.sin(angle);
+                
+                const line = document.createElementNS("http://www.w3.org/2000/svg", "line");
+                line.setAttribute("x1", centerX);
+                line.setAttribute("y1", centerY);
+                line.setAttribute("x2", x);
+                line.setAttribute("y2", y);
+                line.setAttribute("stroke", "#e0e0e0");
+                line.setAttribute("stroke-width", "1");
+                svg.appendChild(line);
+            }
+            
+            // Data polygons will be added by updateChartWithSelectedMeasurements function
+            
+            // Add indicator labels (multi-line text) - positioned well outside the chart
+            for (let i = 0; i < numPoints; i++) {
+                const indicator = indicators[i];
+                const angle = (i * 2 * Math.PI / numPoints) - Math.PI / 2;
+                const labelRadius = radius + 240; // Moved another 30px further away from chart
+                const x = centerX + labelRadius * Math.cos(angle);
+                const y = centerY + labelRadius * Math.sin(angle);
+                
+                // Split long indicator names into multiple lines (2-3 rows)
+                const maxCharsPerLine = 15;
+                const words = indicator.name.split(' ');
+                const lines = [];
+                let currentLine = '';
+                
+                for (const word of words) {
+                    if ((currentLine + ' ' + word).length <= maxCharsPerLine) {
+                        currentLine = currentLine ? currentLine + ' ' + word : word;
+                    } else {
+                        if (currentLine) lines.push(currentLine);
+                        currentLine = word;
+                    }
+                }
+                if (currentLine) lines.push(currentLine);
+                
+                // Limit to 3 lines maximum
+                const displayLines = lines.slice(0, 3);
+                
+                // Create text element for each line - NO VALUE NUMBERS
+                displayLines.forEach((line, lineIndex) => {
+                    const text = document.createElementNS("http://www.w3.org/2000/svg", "text");
+                    text.setAttribute("x", x);
+                    text.setAttribute("y", y + (lineIndex - Math.floor(displayLines.length / 2)) * 36);
+                    text.setAttribute("text-anchor", "middle");
+                    text.setAttribute("dominant-baseline", "middle");
+                    text.setAttribute("font-size", "28");
+                    text.setAttribute("font-weight", "bold");
+                    text.setAttribute("fill", "#333");
+                    text.textContent = line;
+                    svg.appendChild(text);
+                });
+                
+                // Remove the value labels completely - no numbers next to text
+            }
+            
+            // Add zone number labels (0, 1, 2)
+            for (let zone = 0; zone <= 2; zone++) {
+                const zoneRadius = (radius / 2) * (zone + 1);
+                const labelText = document.createElementNS("http://www.w3.org/2000/svg", "text");
+                labelText.setAttribute("x", centerX + zoneRadius - 30);
+                labelText.setAttribute("y", centerY - 15);
+                labelText.setAttribute("text-anchor", "middle");
+                labelText.setAttribute("font-size", "36");
+                labelText.setAttribute("font-weight", "bold");
+                labelText.setAttribute("fill", "#555");
+                labelText.textContent = zone;
+                svg.appendChild(labelText);
+            }
+            
+            container.appendChild(svg);
+        }
+        
+        function createSchemaRow(schema, index) {
+            const container = document.getElementById('chartsContainer');
+            
+            const row = document.createElement('div');
+            row.className = 'schema-row';
+            row.innerHTML = `
+                <div class="chart-section">
+                    <div class="schema-title">${schema.name}</div>
+                    <div class="chart-controls">
+                        ${schema.measurements.map(m => 
+                            `<button class="measurement-selector" data-measurement="${m.id}" onclick="selectMeasurement(${schema.id}, ${m.id})">${m.date}</button>`
+                        ).join('')}
+                    </div>
+                    <div id="chart-${schema.id}"></div>
+                    <div class="risk-score risk-${calculateRiskLevel(schema.totalScore, schema.maxScore, schema.id).level}">
+                        <div>Общий балл: ${schema.totalScore}/${schema.maxScore}</div>
+                        <div>${calculateRiskLevel(schema.totalScore, schema.maxScore, schema.id).text}</div>
+                        <div style="font-size: 12px; opacity: 0.8;">${calculateRiskLevel(schema.totalScore, schema.maxScore, schema.id).range}</div>
+                    </div>
+                </div>
+                <div class="recommendations-section">
+                    <div class="schema-title">🏥 Рекомендации</div>
+                    <div class="recommendations" id="recommendations-${schema.id}">
+                        <!-- Recommendations will be populated here -->
+                    </div>
+                </div>
+            `;
+            
+            container.appendChild(row);
+            
+            // Create the hexagon chart
+            createHexagonChart(schema, `chart-${schema.id}`);
+            
+            // Populate recommendations
+            populateRecommendations(schema);
+            
+            // Set first measurement as active
+            if (schema.measurements.length > 0) {
+                row.querySelector(`button[data-measurement="${schema.measurements[0].id}"]`).classList.add('active');
+            }
+        }
+        
+        function populateRecommendations(schema) {
+            const container = document.getElementById(`recommendations-${schema.id}`);
+            const recommendations = getRecommendations(schema, calculateRiskLevel(schema.totalScore, schema.maxScore, schema.id));
+            
+            let html = '';
+            
+            // Add risk-specific recommendations
+            const riskLevel = calculateRiskLevel(schema.totalScore, schema.maxScore, schema.id);
+            
+            Object.entries(recommendations).forEach(([indicator, recommendation]) => {
+                // Only show recommendations for indicators with non-zero scores
+                const indicatorData = schema.indicators.find(ind => ind.name.includes(indicator.split(' ')[0]));
+                if (indicatorData && indicatorData.value > 0) {
+                    html += `
+                        <div class="recommendation-item">
+                            <div class="recommendation-title">${indicator}</div>
+                            <div>${recommendation}</div>
+                        </div>
+                    `;
+                }
+            });
+            
+            if (!html) {
+                html = `
+                    <div class="recommendation-item">
+                        <div class="recommendation-title">Общие рекомендации</div>
+                        <div>Продолжайте соблюдать регулярную гигиену полости рта и посещайте стоматолога для профилактических осмотров.</div>
+                    </div>
+                `;
+            }
+            
+            container.innerHTML = html;
+        }
+        
+        function updateChartWithSelectedMeasurements(schemaId) {
+            const schema = schemasData.find(s => s.id === schemaId);
+            if (!schema) return;
+            
+            // Get all checked measurements for this schema
+            const selectedMeasurements = [];
+            document.querySelectorAll(`input[data-schema="${schemaId}"]:checked`).forEach(checkbox => {
+                const measurementId = parseInt(checkbox.getAttribute('data-measurement'));
+                const measurement = schema.measurements.find(m => m.id === measurementId);
+                if (measurement) {
+                    selectedMeasurements.push(measurement);
+                }
+            });
+            
+            // Clear existing data polygons
+            const svg = document.querySelector(`#chart-${schemaId} svg`);
+            if (!svg) return;
+            
+            // Remove existing data paths
+            svg.querySelectorAll('.data-polygon').forEach(path => path.remove());
+            
+            // Colors for different measurements
+            const measurementColors = [
+                'rgba(54, 162, 235, 0.7)',   // Blue
+                'rgba(255, 99, 132, 0.7)',   // Red
+                'rgba(75, 192, 192, 0.7)',   // Teal
+                'rgba(153, 102, 255, 0.7)',  // Purple
+                'rgba(255, 159, 64, 0.7)',   // Orange
+                'rgba(199, 199, 199, 0.7)',  // Gray
+                'rgba(83, 102, 255, 0.7)',   // Indigo
+                'rgba(255, 20, 147, 0.7)'    // Pink
+            ];
+            
+            // Add data polygon for each selected measurement
+            selectedMeasurements.forEach((measurement, index) => {
+                const dataPath = document.createElementNS("http://www.w3.org/2000/svg", "path");
+                dataPath.setAttribute("class", "data-polygon");
+                let dataPathString = "";
+                
+                const centerX = 700, centerY = 700, radius = 360;
+                const numPoints = measurement.values.length;
+                
+                for (let i = 0; i <= numPoints; i++) {
+                    const value = measurement.values[i % numPoints];
+                    // Match the background zone scaling: (radius / 2) * (value + 1)
+                    const dataRadius = (radius / 2) * (value.value + 1);
+                    const angle = (i * 2 * Math.PI / numPoints) - Math.PI / 2;
+                    const x = centerX + dataRadius * Math.cos(angle);
+                    const y = centerY + dataRadius * Math.sin(angle);
+                    dataPathString += (i === 0 ? "M" : "L") + x + "," + y;
+                }
+                dataPathString += "Z";
+                
+                const color = measurementColors[index % measurementColors.length];
+                const strokeColor = color.replace('0.7', '1');
+                
+                dataPath.setAttribute("d", dataPathString);
+                dataPath.setAttribute("fill", color.replace('0.7', '0.3'));
+                dataPath.setAttribute("stroke", strokeColor);
+                dataPath.setAttribute("stroke-width", "3");
+                
+                // Add to SVG
+                svg.appendChild(dataPath);
+            });
+            
+            // Add legend for multiple measurements
+            if (selectedMeasurements.length > 1) {
+                updateChartLegend(schemaId, selectedMeasurements, measurementColors);
+            } else {
+                removeChartLegend(schemaId);
+            }
+            
+            // Update risk calculation based on selected measurements
+            updateRiskCalculation(schemaId, selectedMeasurements);
+        }
+        
+        function updateChartLegend(schemaId, measurements, colors) {
+            const container = document.getElementById(`chart-${schemaId}`);
+            
+            // Remove existing legend
+            const existingLegend = container.querySelector('.chart-legend');
+            if (existingLegend) existingLegend.remove();
+            
+            // Create new legend
+            const legend = document.createElement('div');
+            legend.className = 'chart-legend';
+            legend.style.cssText = `
+                display: flex;
+                flex-wrap: wrap;
+                justify-content: center;
+                gap: 15px;
+                margin-top: 10px;
+                font-size: 12px;
+            `;
+            
+            measurements.forEach((measurement, index) => {
+                const legendItem = document.createElement('div');
+                legendItem.style.cssText = `
+                    display: flex;
+                    align-items: center;
+                    gap: 5px;
+                `;
+                
+                const colorBox = document.createElement('div');
+                colorBox.style.cssText = `
+                    width: 16px;
+                    height: 16px;
+                    background-color: ${colors[index % colors.length]};
+                    border-radius: 2px;
+                `;
+                
+                const label = document.createElement('span');
+                label.textContent = measurement.date;
+                label.style.fontWeight = 'bold';
+                
+                legendItem.appendChild(colorBox);
+                legendItem.appendChild(label);
+                legend.appendChild(legendItem);
+            });
+            
+            container.appendChild(legend);
+        }
+        
+        function removeChartLegend(schemaId) {
+            const container = document.getElementById(`chart-${schemaId}`);
+            const legend = container.querySelector('.chart-legend');
+            if (legend) legend.remove();
+        }
+        
+        function updateRiskCalculation(schemaId, selectedMeasurements) {
+            const schema = schemasData.find(s => s.id === schemaId);
+            if (!schema || selectedMeasurements.length === 0) {
+                // If no measurements selected, use original risk info
+                updateRiskDisplay(schemaId, schema.risk_info);
+                return;
+            }
+            
+            // Calculate risk based on the latest selected measurement (or average if multiple)
+            let totalScore = 0;
+            let maxScore = schema.indicators.length * 2;
+            
+            if (selectedMeasurements.length === 1) {
+                // Single measurement selected - calculate its total score
+                const measurement = selectedMeasurements[0];
+                totalScore = measurement.values.reduce((sum, value) => sum + value.value, 0);
+            } else {
+                // Multiple measurements - use the latest one for risk calculation
+                const latestMeasurement = selectedMeasurements.reduce((latest, current) => {
+                    return new Date(current.date) > new Date(latest.date) ? current : latest;
+                });
+                totalScore = latestMeasurement.values.reduce((sum, value) => sum + value.value, 0);
+            }
+            
+            // Use the same risk calculation logic as the backend
+            const riskInfo = calculateRiskFromDatabase(schemaId, totalScore, maxScore);
+            updateRiskDisplay(schemaId, riskInfo);
+        }
+        
+        function calculateRiskFromDatabase(schemaId, totalScore, maxScore) {
+            const schema = schemasData.find(s => s.id === schemaId);
+            
+            // Try to use the original recommendation template matching logic
+            // For now, use simple fallback logic similar to the backend
+            if (schemaId === 1) { // Schema 1 logic
+                if (totalScore >= 10) return { level: 'high', text: 'Высокий риск', range: '10-12 баллов' };
+                if (totalScore >= 5) return { level: 'moderate', text: 'Умеренный риск', range: '5-9 баллов' };
+                return { level: 'low', text: 'Низкий риск', range: '0-4 балла' };
+            } else if (schemaId === 2) { // Schema 2 logic  
+                if (totalScore >= 10) return { level: 'high', text: 'Высокий риск', range: '10-12 баллов' };
+                if (totalScore >= 5) return { level: 'moderate', text: 'Умеренный риск', range: '5-9 баллов' };
+                return { level: 'low', text: 'Низкий риск', range: '0-4 балла' };
+            }
+            
+            // Default fallback
+            const percentage = (totalScore / maxScore) * 100;
+            if (percentage >= 67) return { level: 'high', text: 'Высокий риск', range: `${Math.floor(maxScore * 0.67)}-${maxScore} баллов` };
+            if (percentage >= 33) return { level: 'moderate', text: 'Умеренный риск', range: `${Math.floor(maxScore * 0.33)}-${Math.floor(maxScore * 0.67)-1} баллов` };
+            return { level: 'low', text: 'Низкий риск', range: `0-${Math.floor(maxScore * 0.33)-1} баллов` };
+        }
+        
+        function updateRiskDisplay(schemaId, riskInfo) {
+            const riskElement = document.querySelector(`.schema-row .recommendations-section .risk-score`);
+            if (!riskElement) return;
+            
+            // Find the correct risk element for this schema
+            const schemaRow = document.querySelector(`#chart-${schemaId}`).closest('.schema-row');
+            const riskDisplay = schemaRow.querySelector('.risk-score');
+            
+            if (riskDisplay && riskInfo) {
+                const schema = schemasData.find(s => s.id === schemaId);
+                const maxScore = schema.indicators.length * 2;
+                
+                // Get currently selected measurements to calculate current total
+                const selectedMeasurements = [];
+                document.querySelectorAll(`input[data-schema="${schemaId}"]:checked`).forEach(checkbox => {
+                    const measurementId = parseInt(checkbox.getAttribute('data-measurement'));
+                    const measurement = schema.measurements.find(m => m.id === measurementId);
+                    if (measurement) selectedMeasurements.push(measurement);
+                });
+                
+                let currentTotal = 0;
+                if (selectedMeasurements.length > 0) {
+                    const latestMeasurement = selectedMeasurements.reduce((latest, current) => {
+                        return new Date(current.date) > new Date(latest.date) ? current : latest;
+                    });
+                    currentTotal = latestMeasurement.values.reduce((sum, value) => sum + value.value, 0);
+                } else {
+                    // No measurements selected, use original data
+                    currentTotal = schema.measurements.length > 0 ? 
+                        schema.measurements[0].values.reduce((sum, value) => sum + value.value, 0) : 0;
+                }
+                
+                // Update risk display class
+                riskDisplay.className = `risk-score risk-${riskInfo.level}`;
+                riskDisplay.style.marginBottom = '20px';
+                
+                // Update content
+                riskDisplay.innerHTML = `
+                    <div>Общий балл: ${currentTotal}/${maxScore}</div>
+                    <div>${riskInfo.text}</div>
+                    <div style="font-size: 12px; opacity: 0.8;">${riskInfo.range}</div>
+                `;
+            }
+        }
+        
+        async function fetchArithmeticMean(schemaId) {
+            try {
+                const timestamp = new Date().getTime();
+                const response = await fetch(`/api/measurements/schema_arithmetic_mean/?schema_id=${schemaId}&_t=${timestamp}`, {
+                    cache: 'no-cache',
+                    headers: {
+                        'Cache-Control': 'no-cache, no-store, must-revalidate',
+                        'Pragma': 'no-cache',
+                        'Expires': '0'
+                    }
+                });
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                
+                const data = await response.json();
+                schemasMeanData[schemaId] = data.mean_values;
+                return data.mean_values;
+            } catch (error) {
+                console.error('Error fetching arithmetic mean:', error);
+                return null;
+            }
+        }
+        
+        async function toggleArithmeticMean(schemaId) {
+            const checkbox = document.getElementById(`showMean_${schemaId}`);
+            
+            if (checkbox.checked) {
+                // Load arithmetic mean data if not already loaded
+                if (!schemasMeanData[schemaId]) {
+                    await fetchArithmeticMean(schemaId);
+                }
+                
+                // Add mean line to chart
+                addArithmeticMeanToChart(schemaId);
+            } else {
+                // Remove mean line from chart
+                removeArithmeticMeanFromChart(schemaId);
+            }
+        }
+        
+        function addArithmeticMeanToChart(schemaId) {
+            const svg = document.querySelector(`#chart-${schemaId} svg`);
+            if (!svg || !schemasMeanData[schemaId]) return;
+            
+            // Remove existing mean line
+            svg.querySelectorAll('.arithmetic-mean-line').forEach(line => line.remove());
+            
+            const meanValues = schemasMeanData[schemaId];
+            const centerX = 700, centerY = 700, radius = 360;
+            const numPoints = meanValues.length;
+            
+            // Create dotted line path for arithmetic mean
+            const meanPath = document.createElementNS("http://www.w3.org/2000/svg", "path");
+            meanPath.setAttribute("class", "arithmetic-mean-line");
+            let pathString = "";
+            
+            for (let i = 0; i <= numPoints; i++) {
+                const meanValue = meanValues[i % numPoints];
+                // Match the background zone scaling: (radius / 2) * (value + 1)
+                const dataRadius = (radius / 2) * (meanValue.mean_value + 1);
+                const angle = (i * 2 * Math.PI / numPoints) - Math.PI / 2;
+                const x = centerX + dataRadius * Math.cos(angle);
+                const y = centerY + dataRadius * Math.sin(angle);
+                pathString += (i === 0 ? "M" : "L") + x + "," + y;
+            }
+            pathString += "Z";
+            
+            meanPath.setAttribute("d", pathString);
+            meanPath.setAttribute("fill", "none");
+            meanPath.setAttribute("stroke", "#ff6b35");
+            meanPath.setAttribute("stroke-width", "4");
+            meanPath.setAttribute("stroke-dasharray", "10,5");
+            meanPath.setAttribute("opacity", "0.8");
+            
+            // Add to SVG
+            svg.appendChild(meanPath);
+            
+            // Update legend to include mean line
+            updateLegendWithMean(schemaId, true);
+        }
+        
+        function removeArithmeticMeanFromChart(schemaId) {
+            const svg = document.querySelector(`#chart-${schemaId} svg`);
+            if (!svg) return;
+            
+            // Remove mean line
+            svg.querySelectorAll('.arithmetic-mean-line').forEach(line => line.remove());
+            
+            // Update legend to remove mean line
+            updateLegendWithMean(schemaId, false);
+        }
+        
+        function updateLegendWithMean(schemaId, showMean) {
+            const container = document.getElementById(`chart-${schemaId}`);
+            let legend = container.querySelector('.chart-legend');
+            
+            if (showMean) {
+                if (!legend) {
+                    legend = document.createElement('div');
+                    legend.className = 'chart-legend';
+                    legend.style.cssText = `
+                        display: flex;
+                        flex-wrap: wrap;
+                        justify-content: center;
+                        gap: 15px;
+                        margin-top: 10px;
+                        font-size: 12px;
+                    `;
+                    container.appendChild(legend);
+                }
+                
+                // Add mean line to legend if not exists
+                if (!legend.querySelector('.mean-legend-item')) {
+                    const meanItem = document.createElement('div');
+                    meanItem.className = 'mean-legend-item';
+                    meanItem.style.cssText = `
+                        display: flex;
+                        align-items: center;
+                        gap: 5px;
+                    `;
+                    
+                    meanItem.innerHTML = `
+                        <div style="width: 20px; height: 3px; background-color: #ff6b35; border: 2px dashed #ff6b35;"></div>
+                        <span style="font-weight: bold;">Среднее групповое</span>
+                    `;
+                    
+                    legend.appendChild(meanItem);
+                }
+            } else if (legend) {
+                // Remove mean item from legend
+                const meanItem = legend.querySelector('.mean-legend-item');
+                if (meanItem) meanItem.remove();
+                
+                // Remove legend if empty
+                if (legend.children.length === 0) {
+                    legend.remove();
+                }
+            }
+        }
+        
+        async function fetchRealData() {
+            try {
+                const timestamp = new Date().getTime();
+                const response = await fetch(`/api/measurements/hexagon_chart_data/?patient_id=${patientId}&_t=${timestamp}`, {
+                    cache: 'no-cache',
+                    headers: {
+                        'Cache-Control': 'no-cache, no-store, must-revalidate',
+                        'Pragma': 'no-cache',
+                        'Expires': '0'
+                    }
+                });
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                
+                const data = await response.json();
+                console.log('Real data received:', data);
+                
+                // Store schemas globally for chart updates
+                schemasData = data.schemas;
+                
+                // Clear existing charts
+                document.getElementById('chartsContainer').innerHTML = '';
+                
+                // Create charts with real data
+                data.schemas.forEach((schema, index) => {
+                    if (schema.measurements && schema.measurements.length > 0) {
+                        createSchemaRowFromData(schema, index);
+                    }
+                });
+                
+                // If no data, show message
+                if (!data.schemas.some(s => s.measurements && s.measurements.length > 0)) {
+                    document.getElementById('chartsContainer').innerHTML = `
+                        <div class="schema-row">
+                            <div class="chart-section" style="text-align: center; padding: 40px;">
+                                <h3>📊 Нет данных для отображения</h3>
+                                <p>Добавьте измерения для пациента, чтобы увидеть диаграммы.</p>
+                                <a href="/measurement/add/${patientId}/" class="btn btn-primary">📋 Добавить измерение</a>
+                            </div>
+                        </div>
+                    `;
+                }
+                
+            } catch (error) {
+                console.error('Error fetching real data:', error);
+                // Fallback to sample data
+                sampleSchemas.forEach((schema, index) => {
+                    createSchemaRow(schema, index);
+                });
+            }
+        }
+        
+        function createSchemaRowFromData(schema, index) {
+            const container = document.getElementById('chartsContainer');
+            
+            // Use latest measurement data for the chart
+            const latestMeasurement = schema.measurements[0];
+            const formattedSchema = {
+                id: schema.id,
+                name: schema.name,
+                indicators: latestMeasurement.values.map(v => ({
+                    name: v.indicator_name,
+                    value: v.value,
+                    max: v.max
+                })),
+                totalScore: latestMeasurement.total_score,
+                maxScore: latestMeasurement.values.length * 2,
+                measurements: schema.measurements.map(m => ({
+                    id: m.id,
+                    date: m.date,
+                    data: m.values.map(v => v.value)
+                })),
+                risk_info: schema.risk_info
+            };
+            
+            const row = document.createElement('div');
+            row.className = 'schema-row';
+            
+            const riskClass = schema.risk_info ? schema.risk_info.level : 'low';
+            const riskText = schema.risk_info ? schema.risk_info.text : 'Нет данных';
+            const riskRange = schema.risk_info ? schema.risk_info.range : '';
+            
+            row.innerHTML = `
+                <div class="chart-section">
+                    <div class="schema-title">
+                        ${schema.name}
+                    </div>
+                    <div class="chart-controls">
+                        <div style="margin-bottom: 10px; font-weight: bold;">📅 Выберите измерения для отображения:</div>
+                        ${formattedSchema.measurements.map((m, index) => 
+                            `<label class="measurement-selector">
+                                <input type="checkbox" 
+                                       data-schema="${schema.id}" 
+                                       data-measurement="${m.id}" 
+                                       ${index === 0 ? 'checked' : ''} 
+                                       onchange="updateChartWithSelectedMeasurements(${schema.id})">
+                                ${m.date}
+                            </label>`
+                        ).join('')}
+                        <div style="margin-top: 15px; border-top: 1px solid #ddd; padding-top: 15px;">
+                            <label class="measurement-selector" style="background: #f8f9fa; border-color: #28a745;">
+                                <input type="checkbox" 
+                                       id="showMean_${schema.id}"
+                                       onchange="toggleArithmeticMean(${schema.id})">
+                                Среднее групповое
+                            </label>
+                        </div>
+                    </div>
+                    <div id="chart-${schema.id}"></div>
+                </div>
+                <div class="recommendations-section">
+                    <div class="risk-score risk-${riskClass}" style="margin-bottom: 20px;">
+                        <div>Общий балл: ${formattedSchema.totalScore}/${formattedSchema.maxScore}</div>
+                        <div>${riskText}</div>
+                        <div style="font-size: 12px; opacity: 0.8;">${riskRange}</div>
+                    </div>
+                    <div class="schema-title">🏥 Рекомендации</div>
+                    <div class="recommendations" id="recommendations-${schema.id}">
+                        <!-- Recommendations will be populated here -->
+                    </div>
+                </div>
+            `;
+            
+            container.appendChild(row);
+            
+            // Create the hexagon chart
+            createHexagonChart(formattedSchema, `chart-${schema.id}`);
+            
+            // Populate recommendations
+            populateRecommendationsFromData(formattedSchema);
+            
+            // Initialize chart with first measurement selected
+            setTimeout(() => {
+                updateChartWithSelectedMeasurements(schema.id);
+            }, 100);
+        }
+        
+        function populateRecommendationsFromData(schema) {
+            const container = document.getElementById(`recommendations-${schema.id}`);
+            
+            let html = '';
+            
+            // Use database recommendations if available
+            if (schema.risk_info && schema.risk_info.recommendations) {
+                html += `
+                    <div class="recommendation-item">
+                        <div class="recommendation-title">${schema.risk_info.title || 'Медицинские рекомендации'}</div>
+                        <div>${schema.risk_info.description || ''}</div>
+                        <div style="margin-top: 10px; white-space: pre-line;">${schema.risk_info.recommendations}</div>
+                    </div>
+                `;
+            } else {
+                // Fallback to manual recommendations
+                const recommendations = getRecommendations(schema);
+                
+                Object.entries(recommendations).forEach(([indicator, recommendation]) => {
+                    // Only show recommendations for indicators with non-zero scores
+                    const indicatorData = schema.indicators.find(ind => ind.name.includes(indicator.split(' ')[0]));
+                    if (indicatorData && indicatorData.value > 0) {
+                        html += `
+                            <div class="recommendation-item">
+                                <div class="recommendation-title">${indicator}</div>
+                                <div>${recommendation}</div>
+                            </div>
+                        `;
+                    }
+                });
+            }
+            
+            if (!html) {
+                html = `
+                    <div class="recommendation-item">
+                        <div class="recommendation-title">Общие рекомендации</div>
+                        <div>Продолжайте соблюдать регулярную гигиену полости рта и посещайте стоматолога для профилактических осмотров.</div>
+                    </div>
+                `;
+            }
+            
+            container.innerHTML = html;
+        }
+
+
+        // Initialize when page loads
+        document.addEventListener('DOMContentLoaded', function() {
+            fetchRealData();
+        });
+    </script>
+</body>
+</html>

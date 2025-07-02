@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Добавить пациента - Стоматологическая клиника</title>
+    <link rel="stylesheet" href="/static/css/friendly-styles.css">
+    <style>
+        .existing-patient-alert {
+            background: linear-gradient(135deg, #fff3cd, #ffeaa7);
+            border: 1px solid #ffeaa7;
+            border-left: 6px solid #fd7e14;
+            padding: 25px;
+            margin-bottom: 25px;
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow-light);
+        }
+        .existing-patient-alert h4 {
+            color: #856404;
+            margin-bottom: 15px;
+            font-size: 20px;
+            font-weight: 600;
+        }
+        .existing-patient-info {
+            background: white;
+            padding: 20px;
+            border-radius: var(--border-radius-small);
+            margin: 15px 0;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+            border-left: 4px solid #fd7e14;
+        }
+        .existing-patient-info strong {
+            color: var(--text-primary);
+            font-size: 16px;
+        }
+        .form-actions {
+            display: flex;
+            gap: 15px;
+            justify-content: flex-end;
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 2px solid #f0f0f0;
+        }
+        .required-indicator {
+            color: #dc3545;
+            font-weight: bold;
+        }
+        .form-help {
+            font-size: 13px;
+            color: var(--text-muted);
+            margin-top: 5px;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        .error-container {
+            background: linear-gradient(135deg, #f8d7da, #f1b0b7);
+            border: 1px solid #f1b0b7;
+            border-left: 6px solid #dc3545;
+            padding: 20px;
+            border-radius: var(--border-radius);
+            margin-bottom: 25px;
+            box-shadow: var(--shadow-light);
+        }
+        .error-container strong {
+            color: #721c24;
+            font-size: 16px;
+        }
+        .error-container ul {
+            margin: 10px 0 0 20px;
+            color: #721c24;
+        }
+        .form-intro {
+            background: var(--primary-gradient);
+            color: white;
+            padding: 30px;
+            border-radius: var(--border-radius);
+            text-align: center;
+            margin-bottom: 30px;
+            box-shadow: var(--shadow-heavy);
+        }
+        .form-intro h1 {
+            margin-bottom: 10px;
+            font-size: 28px;
+            font-weight: 700;
+        }
+        .form-intro p {
+            font-size: 16px;
+            opacity: 0.9;
+            margin: 0;
+        }
+    </style>
+</head>
+<body>
+    <!-- Header Navigation -->
+    <header class="page-header">
+        <h1 class="page-title">👤 Добавить пациента</h1>
+        <p class="page-subtitle">Создание нового профиля пациента</p>
+        
+        <nav class="nav-bar mt-20">
+            <a href="/" class="nav-link">🏠 Панель управления</a>
+            <a href="/patients/" class="nav-link">👥 Все пациенты</a>
+            <a href="/patient/add/" class="nav-link">➕ Новый пациент</a>
+            <a href="/indicators/" class="nav-link">⚙️ Настройки</a>
+        </nav>
+    </header>
+
+    <div class="main-container">
+        <!-- Messages Section -->
+        {% include 'components/messages.html' %}
+        
+        <!-- Form Content -->
+        <div class="form-container fade-in-up">
+            {% if existing_patient %}
+                <div class="existing-patient-alert">
+                    <h4>⚠️ Пациент уже существует</h4>
+                    <p>Пациент с данным номером истории болезни уже существует в системе:</p>
+                    <div class="existing-patient-info">
+                        <strong>{{ existing_patient.full_name }}</strong><br>
+                        <div style="margin-top: 10px; display: grid; gap: 5px;">
+                            <span>📋 История болезни: {{ existing_patient.history_of_illness }}</span>
+                            <span>🎂 Дата рождения: {{ existing_patient.date_of_birth|date:"d.m.Y" }}</span>
+                            <span>📱 Телефон: {{ existing_patient.phone_number }}</span>
+                            {% if existing_patient.email %}<span>📧 Email: {{ existing_patient.email }}</span>{% endif %}
+                            <span>📅 Создан: {{ existing_patient.created_at|date:"d.m.Y H:i" }}</span>
+                        </div>
+                    </div>
+                    <p><strong>Хотите отредактировать существующего пациента?</strong></p>
+                    <div style="display: flex; gap: 15px; margin-top: 20px;">
+                        <a href="{% url 'edit_patient' existing_patient.id %}" class="btn btn-warning">
+                            ✏️ Редактировать пациента
+                        </a>
+                        <a href="{% url 'radar_chart' existing_patient.id %}" class="btn btn-primary">
+                            📊 Смотреть диаграмму
+                        </a>
+                    </div>
+                </div>
+            {% endif %}
+            
+            {% if form.errors %}
+                <div class="error-container">
+                    <strong>❌ Пожалуйста, исправьте следующие ошибки:</strong>
+                    <ul>
+                        {% for field, errors in form.errors.items %}
+                            {% for error in errors %}
+                                <li>{{ field }}: {{ error }}</li>
+                            {% endfor %}
+                        {% endfor %}
+                    </ul>
+                </div>
+            {% endif %}
+            
+            <!-- Patient Form -->
+            <form method="post">
+                {% csrf_token %}
+                
+                <!-- Medical Information Section -->
+                <div class="card mb-20">
+                    <div class="card-header">
+                        📋 Медицинская информация
+                    </div>
+                    <div class="card-body">
+                        <div class="form-group">
+                            <label for="{{ form.history_of_illness.id_for_label }}" class="form-label">
+                                Номер истории болезни <span style="color: #dc3545;">*</span>
+                            </label>
+                            {{ form.history_of_illness }}
+                            <div class="form-text">
+                                💡 Уникальный номер истории болезни (максимум 10 символов)
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Personal Information Section -->
+                <div class="card mb-20">
+                    <div class="card-header">
+                        👤 Личная информация
+                    </div>
+                    <div class="card-body">
+                        <div class="form-grid">
+                            <div class="form-group">
+                                <label for="{{ form.first_name.id_for_label }}" class="form-label">
+                                    Имя <span style="color: #dc3545;">*</span>
+                                </label>
+                                {{ form.first_name }}
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="{{ form.last_name.id_for_label }}" class="form-label">
+                                    Фамилия <span style="color: #dc3545;">*</span>
+                                </label>
+                                {{ form.last_name }}
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="{{ form.patronymic.id_for_label }}" class="form-label">
+                                    Отчество
+                                </label>
+                                {{ form.patronymic }}
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="{{ form.date_of_birth.id_for_label }}" class="form-label">
+                                    Дата рождения <span style="color: #dc3545;">*</span>
+                                </label>
+                                {{ form.date_of_birth }}
+                                <div class="form-text">
+                                    📅 Формат: ДД.ММ.ГГГГ
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Contact Information Section -->
+                <div class="card mb-20 collapsible-card">
+                    <div class="card-header collapsible-header" onclick="toggleSection('contact-info')">
+                        📞 Контактная информация
+                        <span class="collapse-indicator" id="contact-info-indicator">▼</span>
+                    </div>
+                    <div class="card-body collapsible-content" id="contact-info" style="display: none;">
+                        <div class="form-grid">
+                            <div class="form-group">
+                                <label for="{{ form.phone_number.id_for_label }}" class="form-label">
+                                    Номер телефона
+                                </label>
+                                {{ form.phone_number }}
+                                <div class="form-text">
+                                    📱 Любой формат: +7(xxx)xxx-xx-xx, 8xxxxxxxxxx
+                                </div>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="{{ form.email.id_for_label }}" class="form-label">
+                                    Email
+                                </label>
+                                {{ form.email }}
+                            </div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="{{ form.address.id_for_label }}" class="form-label">
+                                Адрес
+                            </label>
+                            {{ form.address }}
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Form Actions -->
+                <div class="form-actions">
+                    <a href="/patients/" class="btn btn-warning">
+                        ❌ Отмена
+                    </a>
+                    <button type="submit" class="btn btn-primary btn-lg">
+                        ✅ Добавить пациента
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        // Toggle collapsible sections
+        function toggleSection(sectionId) {
+            const content = document.getElementById(sectionId);
+            const indicator = document.getElementById(sectionId + '-indicator');
+            
+            if (content.style.display === 'none') {
+                content.style.display = 'block';
+                indicator.textContent = '▲';
+                indicator.style.transform = 'rotate(180deg)';
+            } else {
+                content.style.display = 'none';
+                indicator.textContent = '▼';
+                indicator.style.transform = 'rotate(0deg)';
+            }
+        }
+
+        // Add focus animations to form fields
+        document.addEventListener('DOMContentLoaded', function() {
+            const formControls = document.querySelectorAll('.form-control');
+            formControls.forEach(control => {
+                control.addEventListener('focus', function() {
+                    this.parentElement.style.transform = 'scale(1.02)';
+                });
+                control.addEventListener('blur', function() {
+                    this.parentElement.style.transform = 'scale(1)';
+                });
+            });
+        });
+    </script>
+
+    <style>
+        .collapsible-header {
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            user-select: none;
+            transition: all 0.3s ease;
+        }
+        
+        .collapsible-header:hover {
+            background: linear-gradient(135deg, #5a6fd8 0%, #6b5b95 100%);
+        }
+        
+        .collapse-indicator {
+            font-size: 14px;
+            font-weight: bold;
+            transition: transform 0.3s ease;
+            color: white;
+        }
+        
+        .collapsible-content {
+            transition: all 0.3s ease;
+        }
+        
+        .collapsible-card .card-header {
+            border-bottom: 1px solid #e9ecef;
+        }
+        
+        .collapsible-card .card-body {
+            border-top: none;
+        }
+    </style>
+</body>
+</html>

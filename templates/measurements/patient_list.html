@@ -1,0 +1,556 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Пациенты - Стоматологическая клиника</title>
+    <link rel="stylesheet" href="/static/css/friendly-styles.css">
+    <style>
+        .patient-info h3::before {
+            content: '👤';
+            font-size: 24px;
+        }
+        .patient-details {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        .detail-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: var(--text-secondary);
+            font-size: 14px;
+        }
+        .detail-icon {
+            font-size: 16px;
+            width: 20px;
+            text-align: center;
+        }
+        .measurement-badge {
+            background: var(--info-gradient);
+            color: white;
+            padding: 4px 12px;
+            border-radius: 15px;
+            font-size: 12px;
+            font-weight: 600;
+            box-shadow: 0 2px 8px rgba(23, 162, 184, 0.3);
+        }
+        .patient-actions {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+        .filter-controls {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            background: var(--bg-white);
+            padding: 15px 20px;
+            border-radius: var(--border-radius-small);
+            box-shadow: var(--shadow-light);
+            margin-bottom: 20px;
+        }
+        .filter-label {
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-right: 10px;
+        }
+        .filter-btn {
+            padding: 8px 16px;
+            border: 2px solid #e9ecef;
+            border-radius: 20px;
+            background: white;
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-weight: 600;
+            transition: var(--transition);
+            font-size: 14px;
+        }
+        .filter-btn:hover {
+            border-color: #667eea;
+            color: #667eea;
+            transform: translateY(-1px);
+            text-decoration: none;
+        }
+        .filter-btn.active {
+            background: var(--primary-gradient);
+            color: white;
+            border-color: transparent;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+        }
+        .patients-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+        .patients-count {
+            font-size: 18px;
+            color: var(--text-primary);
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .patients-count::before {
+            content: '👥';
+            font-size: 24px;
+        }
+        .no-patients {
+            text-align: center;
+            padding: 80px 20px;
+            color: var(--text-muted);
+        }
+        .no-patients-icon {
+            font-size: 72px;
+            margin-bottom: 25px;
+            opacity: 0.5;
+        }
+        .no-patients h3 {
+            color: var(--text-primary);
+            margin-bottom: 15px;
+            font-size: 28px;
+            font-weight: 600;
+        }
+        .no-patients p {
+            font-size: 16px;
+            margin-bottom: 25px;
+        }
+    </style>
+</head>
+<body>
+    <!-- Header Navigation -->
+    <header class="page-header">
+        <h1 class="page-title">👥 Пациенты</h1>
+        <p class="page-subtitle">Управление пациентами стоматологической клиники</p>
+        
+        <nav class="nav-bar mt-20">
+            <a href="/" class="nav-link">🏠 Панель управления</a>
+            <a href="/patients/" class="nav-link">👥 Все пациенты</a>
+            <a href="/indicators/" class="nav-link">⚙️ Настройки</a>
+        </nav>
+    </header>
+
+    <div class="main-container">
+        <!-- Messages Section -->
+        {% include 'components/messages.html' %}
+
+        <div class="card fade-in-up">
+            <div class="card-body">
+                <div class="patients-header">
+                    <div class="patients-count">
+                        Страница {{ patients_page.number }} из {{ patients_page.paginator.num_pages }} 
+                        ({{ showing_count }} из {{ total_patients }} пациентов)
+                    </div>
+                    <div class="middle-controls">
+                        <a href="/patient/add/" class="btn btn-primary btn-sm" style="transform: scale(1.3); margin-right: 50px;">
+                            ➕ Новый пациент
+                        </a>
+                    </div>
+                    <div class="page-size-controls">
+                        <span class="filter-label">📊 Показать:</span>
+                        <a href="?size=5{% if request.GET.page %}&page={{ request.GET.page }}{% endif %}" 
+                           class="page-size-btn {% if page_size == 5 %}active{% endif %}">5</a>
+                        <a href="?size=10{% if request.GET.page %}&page={{ request.GET.page }}{% endif %}" 
+                           class="page-size-btn {% if page_size == 10 %}active{% endif %}">10</a>
+                        <a href="?size=50{% if request.GET.page %}&page={{ request.GET.page }}{% endif %}" 
+                           class="page-size-btn {% if page_size == 50 %}active{% endif %}">50</a>
+                    </div>
+                </div>
+                
+                <!-- AI Filter Controls -->
+                <div class="ai-filter-section">
+                    <div class="ai-filter-controls">
+                        <span class="filter-label">🤖 Умный фильтр:</span>
+                        <button class="ai-filter-btn active" onclick="filterPatients('all')" data-filter="all">
+                            👥 Все пациенты
+                        </button>
+                        <button class="ai-filter-btn" onclick="filterPatients('high-risk')" data-filter="high-risk">
+                            🔴 Высокий риск
+                        </button>
+                        <button class="ai-filter-btn" onclick="filterPatients('medium-risk')" data-filter="medium-risk">
+                            🟡 Средний риск
+                        </button>
+                        <button class="ai-filter-btn" onclick="filterPatients('low-risk')" data-filter="low-risk">
+                            🟢 Низкий риск
+                        </button>
+                        <button class="ai-filter-btn" onclick="filterPatients('no-data')" data-filter="no-data">
+                            ⚪ Без измерений
+                        </button>
+                    </div>
+                </div>
+                
+                {% if patients %}
+                    {% for patient in patients %}
+                        <div class="patient-card fade-in-up" 
+                             data-status="{{ patient.status }}" 
+                             data-risk-level="{{ patient.status }}"
+                             data-has-measurements="{% if patient.measurement_count > 0 %}true{% else %}false{% endif %}"
+                             data-score="{{ patient.total_score|default:0 }}"
+                             data-max-score="{{ patient.max_score|default:0 }}">
+                            <div class="patient-header">
+                                <div class="patient-info">
+                                    <h3>{{ patient.full_name }}</h3>
+                                </div>
+                                <div class="measurement-badge">
+                                    📊 {{ patient.measurement_count }} измерений
+                                </div>
+                            </div>
+                            
+                            <div class="patient-details">
+                                <div class="detail-item">
+                                    <span class="detail-icon">🎂</span>
+                                    <span><strong>Дата рождения:</strong> {{ patient.date_of_birth|date:"d.m.Y" }}</span>
+                                </div>
+                                <div class="detail-item">
+                                    <span class="detail-icon">
+                                        {% if patient.status == 'low' %}🟢
+                                        {% elif patient.status == 'medium' %}🟡
+                                        {% elif patient.status == 'high' %}🔴
+                                        {% else %}⚪{% endif %}
+                                    </span>
+                                    <span><strong>Статус:</strong> 
+                                        <span class="status-badge status-{{ patient.status_color }}">
+                                            {{ patient.status_text }}
+                                            {% if patient.total_score %}
+                                                ({{ patient.total_score }}/{{ patient.max_score }})
+                                            {% endif %}
+                                        </span>
+                                    </span>
+                                </div>
+                                {% if patient.email %}
+                                <div class="detail-item">
+                                    <span class="detail-icon">📧</span>
+                                    <span><strong>Email:</strong> {{ patient.email }}</span>
+                                </div>
+                                {% endif %}
+                                {% if patient.history_of_illness %}
+                                <div class="detail-item">
+                                    <span class="detail-icon">📋</span>
+                                    <span><strong>История болезни:</strong> {{ patient.history_of_illness }}</span>
+                                </div>
+                                {% endif %}
+                            </div>
+                            
+                            <div class="patient-actions">
+                                {% if patient.measurement_count > 0 %}
+                                    <a href="/chart/{{ patient.id }}/" class="btn btn-primary">
+                                        📊 Диаграмма
+                                    </a>
+                                {% endif %}
+                                <a href="/measurement/add/{{ patient.id }}/" class="btn btn-success">
+                                    📋 Добавить измерение
+                                </a>
+                                <a href="/patient/edit/{{ patient.id }}/" class="btn btn-warning">
+                                    ✏️ Редактировать
+                                </a>
+                                <a href="/patient/delete/{{ patient.id }}/" class="btn btn-danger">
+                                    🗑️ Удалить
+                                </a>
+                            </div>
+                        </div>
+                    {% endfor %}
+                    
+                    <!-- Pagination Controls -->
+                    {% if patients_page.paginator.num_pages > 1 %}
+                        <div class="pagination-controls">
+                            <div class="pagination">
+                                <!-- Previous Page -->
+                                {% if patients_page.has_previous %}
+                                    <a href="?page=1&size={{ page_size }}" class="pagination-btn pagination-first">
+                                        ⏮️ Первая
+                                    </a>
+                                    <a href="?page={{ patients_page.previous_page_number }}&size={{ page_size }}" class="pagination-btn pagination-prev">
+                                        ◀️ Назад
+                                    </a>
+                                {% endif %}
+                                
+                                <!-- Page Numbers -->
+                                {% for page_num in patients_page.paginator.page_range %}
+                                    {% if page_num == patients_page.number %}
+                                        <span class="pagination-btn pagination-current">{{ page_num }}</span>
+                                    {% elif page_num > patients_page.number|add:'-3' and page_num < patients_page.number|add:'3' %}
+                                        <a href="?page={{ page_num }}&size={{ page_size }}" class="pagination-btn">{{ page_num }}</a>
+                                    {% endif %}
+                                {% endfor %}
+                                
+                                <!-- Next Page -->
+                                {% if patients_page.has_next %}
+                                    <a href="?page={{ patients_page.next_page_number }}&size={{ page_size }}" class="pagination-btn pagination-next">
+                                        Вперед ▶️
+                                    </a>
+                                    <a href="?page={{ patients_page.paginator.num_pages }}&size={{ page_size }}" class="pagination-btn pagination-last">
+                                        Последняя ⏭️
+                                    </a>
+                                {% endif %}
+                            </div>
+                            
+                            <div class="pagination-info">
+                                Показано {{ patients_page.start_index }} - {{ patients_page.end_index }} 
+                                из {{ patients_page.paginator.count }} пациентов
+                            </div>
+                        </div>
+                    {% endif %}
+                {% else %}
+                    <div class="no-patients">
+                        <div class="no-patients-icon">👥</div>
+                        <h3>Пациентов пока нет</h3>
+                        <p>Добавьте первого пациента, чтобы начать работу с системой</p>
+                        <a href="/patient/add/" class="btn btn-primary btn-lg">
+                            ➕ Добавить первого пациента
+                        </a>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // AI-powered patient filtering system
+        function filterPatients(filterType) {
+            const cards = document.querySelectorAll('.patient-card');
+            const buttons = document.querySelectorAll('.ai-filter-btn');
+            
+            // Update button states
+            buttons.forEach(btn => btn.classList.remove('active'));
+            document.querySelector(`[data-filter="${filterType}"]`).classList.add('active');
+            
+            let visibleCount = 0;
+            
+            cards.forEach(card => {
+                const status = card.dataset.status;
+                const hasMeasurements = card.dataset.hasMeasurements === 'true';
+                const score = parseInt(card.dataset.score) || 0;
+                const maxScore = parseInt(card.dataset.maxScore) || 0;
+                
+                let shouldShow = false;
+                
+                switch(filterType) {
+                    case 'all':
+                        shouldShow = true;
+                        break;
+                    case 'high-risk':
+                        shouldShow = status === 'high';
+                        break;
+                    case 'medium-risk':
+                        shouldShow = status === 'medium';
+                        break;
+                    case 'low-risk':
+                        shouldShow = status === 'low';
+                        break;
+                    case 'no-data':
+                        shouldShow = status === 'no_data';
+                        break;
+                }
+                
+                if (shouldShow) {
+                    card.style.display = 'block';
+                    card.style.animation = `fadeInUp 0.6s ease ${visibleCount * 0.1}s both`;
+                    visibleCount++;
+                } else {
+                    card.style.display = 'none';
+                }
+            });
+            
+            // Update counter
+            updatePatientCount(visibleCount, filterType);
+        }
+        
+        function updatePatientCount(visibleCount, filterType) {
+            const counter = document.querySelector('.patients-count');
+            const filterNames = {
+                'all': 'Все пациенты',
+                'high-risk': 'Высокий риск',
+                'medium-risk': 'Средний риск', 
+                'low-risk': 'Низкий риск',
+                'no-data': 'Без измерений'
+            };
+            
+            const filterName = filterNames[filterType] || 'Пациенты';
+            counter.textContent = `${filterName}: ${visibleCount} пациентов`;
+        }
+
+        // Initialize on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            const cards = document.querySelectorAll('.patient-card');
+            cards.forEach((card, index) => {
+                card.style.animationDelay = `${index * 0.1}s`;
+            });
+        });
+    </script>
+
+    <style>
+        /* 🤖 AI Filter Controls */
+        .ai-filter-controls {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+        
+        .ai-filter-btn {
+            padding: 8px 16px;
+            border: 2px solid #e9ecef;
+            border-radius: 20px;
+            background: white;
+            color: var(--text-secondary);
+            font-weight: 600;
+            transition: var(--transition);
+            font-size: 13px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            white-space: nowrap;
+        }
+        
+        .ai-filter-btn:hover {
+            border-color: #667eea;
+            color: #667eea;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.2);
+        }
+        
+        .ai-filter-btn.active {
+            background: var(--primary-gradient);
+            color: white;
+            border-color: transparent;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+        }
+        
+        .ai-filter-btn.active:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+        }
+        
+        /* 📄 Page Size Controls */
+        .page-size-controls {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+        
+        .page-size-btn {
+            padding: 6px 12px;
+            border: 2px solid #e9ecef;
+            border-radius: 15px;
+            background: white;
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-weight: 600;
+            transition: var(--transition);
+            font-size: 13px;
+            min-width: 35px;
+            text-align: center;
+        }
+        
+        .page-size-btn:hover {
+            border-color: #667eea;
+            color: #667eea;
+            transform: translateY(-1px);
+            text-decoration: none;
+        }
+        
+        .page-size-btn.active {
+            background: var(--primary-gradient);
+            color: white;
+            border-color: transparent;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+        }
+        
+        /* 📄 Pagination Controls */
+        .pagination-controls {
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 2px solid #f0f0f0;
+        }
+        
+        .pagination {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 15px;
+            flex-wrap: wrap;
+        }
+        
+        .pagination-btn {
+            padding: 8px 12px;
+            border: 2px solid #e9ecef;
+            border-radius: 8px;
+            background: white;
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-weight: 600;
+            transition: var(--transition);
+            font-size: 14px;
+            min-width: 40px;
+            text-align: center;
+        }
+        
+        .pagination-btn:hover {
+            border-color: #667eea;
+            color: #667eea;
+            transform: translateY(-1px);
+            text-decoration: none;
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.2);
+        }
+        
+        .pagination-current {
+            background: var(--primary-gradient);
+            color: white;
+            border-color: transparent;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+        }
+        
+        .pagination-info {
+            text-align: center;
+            color: var(--text-muted);
+            font-size: 14px;
+            font-weight: 500;
+        }
+        
+        .ai-filter-section {
+            margin: 20px 0;
+            padding: 15px;
+            background: linear-gradient(135deg, #f8f9ff, #fff);
+            border-radius: var(--border-radius-small);
+            border: 1px solid #e3f2fd;
+        }
+        
+        /* Responsive controls */
+        @media (max-width: 768px) {
+            .patients-header {
+                flex-direction: column;
+                gap: 15px;
+                align-items: flex-start;
+            }
+            
+            .ai-filter-controls, .page-size-controls {
+                width: 100%;
+                justify-content: flex-start;
+            }
+            
+            .ai-filter-btn, .page-size-btn {
+                font-size: 12px;
+                padding: 6px 10px;
+            }
+            
+            .pagination {
+                gap: 5px;
+            }
+            
+            .pagination-btn {
+                padding: 6px 10px;
+                font-size: 13px;
+                min-width: 35px;
+            }
+        }
+    </style>
+</body>
+</html>

@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Profile - {{ profile.full_name }}</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background-color: #f5f5f5;
+        }
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .nav {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        .nav a {
+            margin: 0 15px;
+            padding: 10px 20px;
+            background: #007bff;
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+        }
+        .nav a:hover {
+            background: #0056b3;
+        }
+        .profile-container {
+            background: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        .profile-section {
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid #eee;
+        }
+        .profile-section:last-child {
+            border-bottom: none;
+        }
+        .profile-section h3 {
+            color: #333;
+            margin-bottom: 15px;
+            font-size: 18px;
+        }
+        .profile-info {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+        }
+        .info-item {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 6px;
+            border-left: 4px solid #007bff;
+        }
+        .info-label {
+            font-weight: bold;
+            color: #555;
+            margin-bottom: 5px;
+        }
+        .info-value {
+            color: #333;
+            font-size: 16px;
+        }
+        .role-badge {
+            display: inline-block;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: bold;
+            text-transform: uppercase;
+        }
+        .role-doctor {
+            background: #28a745;
+            color: white;
+        }
+        .role-nurse {
+            background: #17a2b8;
+            color: white;
+        }
+        .role-admin {
+            background: #dc3545;
+            color: white;
+        }
+        .role-researcher {
+            background: #6f42c1;
+            color: white;
+        }
+        .sessions-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+        }
+        .sessions-table th,
+        .sessions-table td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+        .sessions-table th {
+            background: #f8f9fa;
+            font-weight: bold;
+            color: #555;
+        }
+        .session-active {
+            color: #28a745;
+            font-weight: bold;
+        }
+        .session-inactive {
+            color: #6c757d;
+        }
+        .logout-btn {
+            background: #dc3545;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            text-decoration: none;
+            display: inline-block;
+            margin-top: 20px;
+        }
+        .logout-btn:hover {
+            background: #c82333;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>👤 User Profile</h1>
+        <p>{{ profile.full_name }}</p>
+    </div>
+
+    <div class="nav">
+        <a href="/">Dashboard</a>
+        <a href="/patients/">All Patients</a>
+        <a href="/indicators/">Manage Indicators</a>
+        {% if profile.can_manage_users %}
+            <a href="/admin/">Admin Panel</a>
+        {% endif %}
+    </div>
+
+    <div class="profile-container">
+        {% include 'components/messages.html' %}
+
+        <div class="profile-section">
+            <h3>Personal Information</h3>
+            <div class="profile-info">
+                <div class="info-item">
+                    <div class="info-label">Full Name</div>
+                    <div class="info-value">{{ profile.user.get_full_name|default:profile.user.username }}</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">Username</div>
+                    <div class="info-value">{{ profile.user.username }}</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">Email</div>
+                    <div class="info-value">{{ profile.user.email|default:"Not provided" }}</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">Phone</div>
+                    <div class="info-value">{{ profile.phone|default:"Not provided" }}</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="profile-section">
+            <h3>Professional Information</h3>
+            <div class="profile-info">
+                <div class="info-item">
+                    <div class="info-label">Role</div>
+                    <div class="info-value">
+                        <span class="role-badge role-{{ profile.role }}">{{ profile.get_role_display }}</span>
+                    </div>
+                </div>
+                {% if profile.license_number %}
+                <div class="info-item">
+                    <div class="info-label">License Number</div>
+                    <div class="info-value">{{ profile.license_number }}</div>
+                </div>
+                {% endif %}
+                {% if profile.department %}
+                <div class="info-item">
+                    <div class="info-label">Department</div>
+                    <div class="info-value">{{ profile.department }}</div>
+                </div>
+                {% endif %}
+                <div class="info-item">
+                    <div class="info-label">Account Created</div>
+                    <div class="info-value">{{ profile.created_at|date:"F d, Y" }}</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="profile-section">
+            <h3>Permissions</h3>
+            <div class="profile-info">
+                <div class="info-item">
+                    <div class="info-label">View All Patients</div>
+                    <div class="info-value">{{ profile.can_view_all_patients|yesno:"✅ Yes,❌ No" }}</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">Edit Patient Data</div>
+                    <div class="info-value">{{ profile.can_edit_patients|yesno:"✅ Yes,❌ No" }}</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">Delete Data</div>
+                    <div class="info-value">{{ profile.can_delete_data|yesno:"✅ Yes,❌ No" }}</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">View Analytics</div>
+                    <div class="info-value">{{ profile.can_view_analytics|yesno:"✅ Yes,❌ No" }}</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="profile-section">
+            <h3>Recent Login Sessions</h3>
+            {% if recent_sessions %}
+                <table class="sessions-table">
+                    <thead>
+                        <tr>
+                            <th>Login Time</th>
+                            <th>IP Address</th>
+                            <th>Status</th>
+                            <th>Duration</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for session in recent_sessions %}
+                        <tr>
+                            <td>{{ session.login_time|date:"M d, Y H:i" }}</td>
+                            <td>{{ session.ip_address|default:"Unknown" }}</td>
+                            <td>
+                                {% if session.is_active %}
+                                    <span class="session-active">Active</span>
+                                {% else %}
+                                    <span class="session-inactive">Ended</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                {% if session.logout_time %}
+                                    {{ session.logout_time|timesince:session.login_time }}
+                                {% elif session.is_active %}
+                                    {{ session.login_time|timesince }} ago
+                                {% else %}
+                                    Unknown
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            {% else %}
+                <p>No recent sessions found.</p>
+            {% endif %}
+        </div>
+
+        <div style="text-align: center;">
+            <a href="{% url 'logout' %}" class="logout-btn">🚪 Logout</a>
+        </div>
+    </div>
+</body>
+</html>

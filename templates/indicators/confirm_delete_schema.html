@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Delete Schema - Dental Office</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background-color: #f5f5f5;
+        }
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .nav {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        .nav a {
+            margin: 0 15px;
+            padding: 10px 20px;
+            background: #007bff;
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+        }
+        .nav a:hover {
+            background: #0056b3;
+        }
+        .delete-container {
+            background: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        .warning-box {
+            background: #f8d7da;
+            color: #721c24;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            border-left: 4px solid #dc3545;
+        }
+        .schema-info {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 5px;
+            margin: 20px 0;
+        }
+        .schema-info h3 {
+            margin: 0 0 10px 0;
+            color: #333;
+        }
+        .schema-info p {
+            margin: 5px 0;
+            color: #666;
+        }
+        .stats-alert {
+            background: #fff3cd;
+            color: #856404;
+            padding: 15px;
+            border-radius: 5px;
+            margin: 15px 0;
+            border-left: 4px solid #ffc107;
+        }
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 4px;
+            font-size: 16px;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-block;
+            margin-right: 10px;
+        }
+        .btn-danger {
+            background: #dc3545;
+            color: white;
+        }
+        .btn-danger:hover {
+            background: #c82333;
+        }
+        .btn-secondary {
+            background: #6c757d;
+            color: white;
+        }
+        .btn-secondary:hover {
+            background: #545b62;
+        }
+        .form-actions {
+            text-align: center;
+            margin-top: 30px;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>🗑️ Delete Schema</h1>
+        <p>Confirm deletion of measurement schema</p>
+    </div>
+
+    <div class="nav">
+        <a href="/">Dashboard</a>
+        <a href="/patients/">All Patients</a>
+        <a href="/indicators/schemas/">All Schemas</a>
+    </div>
+
+    <div class="delete-container">
+        <div class="warning-box">
+            <h3>⚠️ Warning: This action cannot be undone!</h3>
+            <p>You are about to permanently delete this schema and all associated indicators and measurement data.</p>
+        </div>
+
+        <div class="schema-info">
+            <h3>{{ schema.name }}</h3>
+            {% if schema.description %}
+                <p><strong>Description:</strong> {{ schema.description }}</p>
+            {% endif %}
+            <p><strong>Display Order:</strong> {{ schema.order }}</p>
+            <p><strong>Status:</strong> {% if schema.is_active %}Active{% else %}Inactive{% endif %}</p>
+        </div>
+
+        {% if indicator_count > 0 or measurement_count > 0 %}
+            <div class="stats-alert">
+                <strong>⚠️ Data Impact:</strong>
+                <ul>
+                    {% if indicator_count > 0 %}
+                        <li>This schema has <strong>{{ indicator_count }}</strong> indicator(s) that will be deleted.</li>
+                    {% endif %}
+                    {% if measurement_count > 0 %}
+                        <li>This will permanently remove <strong>{{ measurement_count }}</strong> measurement value(s) from the system.</li>
+                    {% endif %}
+                </ul>
+                <p>This will permanently remove patient measurement data from the system.</p>
+            </div>
+        {% else %}
+            <div style="background: #d4edda; color: #155724; padding: 15px; border-radius: 5px; margin: 15px 0;">
+                <p>✅ No indicators or measurement data will be affected - this schema is empty.</p>
+            </div>
+        {% endif %}
+
+        <form method="post" class="form-actions">
+            {% csrf_token %}
+            <button type="submit" class="btn btn-danger">
+                🗑️ Yes, Delete Schema
+            </button>
+            <a href="{% url 'schema_list' %}" class="btn btn-secondary">
+                ↩️ Cancel
+            </a>
+        </form>
+    </div>
+</body>
+</html>

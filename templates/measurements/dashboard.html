@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Панель управления - Стоматологическая клиника</title>
+    <link rel="stylesheet" href="/static/css/friendly-styles.css?v=2">
+    <style>
+        /* Quick Actions Styles */
+        .quick-actions-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+        }
+        .quick-action-card {
+            background: linear-gradient(135deg, #f8f9ff, #fff);
+            border: 1px solid #e3f2fd;
+            border-radius: 15px;
+            padding: 25px;
+            text-decoration: none;
+            color: inherit;
+            transition: all 0.3s ease;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+            display: block;
+        }
+        .quick-action-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            transition: all 0.3s ease;
+        }
+        .quick-action-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+            text-decoration: none;
+            color: inherit;
+        }
+        .quick-action-card:hover::before {
+            height: 6px;
+            background: linear-gradient(135deg, #28a745, #20c997);
+        }
+        .quick-action-icon {
+            font-size: 32px;
+            margin-bottom: 15px;
+            display: block;
+        }
+        .quick-action-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: #2c3e50;
+            margin-bottom: 10px;
+        }
+        .quick-action-desc {
+            font-size: 14px;
+            color: #6c757d;
+            line-height: 1.4;
+        }
+    </style>
+</head>
+<body>
+    <!-- Header Navigation -->
+    <header class="page-header">
+        <h1 class="page-title">🦷 Стоматологическая клиника</h1>
+        <p class="page-subtitle">Система управления медицинской практикой</p>
+        
+        <nav class="nav-bar mt-20">
+            <a href="/" class="nav-link">🏠 Панель управления</a>
+            {% if user.profile.can_view_all_patients %}
+                <a href="/patients/" class="nav-link">👥 Пациенты</a>
+            {% endif %}
+            {% if user.profile.can_edit_patients %}
+                <a href="/patient/add/" class="nav-link">➕ Новый пациент</a>
+            {% endif %}
+            <a href="/indicators/" class="nav-link">⚙️ Настройки</a>
+            <a href="/auth/logout/" class="nav-link btn-danger">🚪 Выход</a>
+        </nav>
+    </header>
+
+    <div class="main-container">
+        <!-- Messages Section -->
+        {% include 'components/messages.html' %}
+
+        <!-- Dashboard Stats -->
+        <section class="stats-grid fade-in-up">
+            <div class="stat-card">
+                <div class="stat-number">{{ total_patients }}</div>
+                <div class="stat-label">👥 Всего пациентов</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number">{{ total_measurements }}</div>
+                <div class="stat-label">📊 Всего измерений</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number">{{ active_indicators }}</div>
+                <div class="stat-label">⚡ Активных индикаторов</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number">6</div>
+                <div class="stat-label">🎯 Макс. индикаторов</div>
+            </div>
+        </section>
+
+        <!-- Quick Actions -->
+        <section class="card fade-in-up">
+            <div class="card-header">
+                🚀 Быстрые действия
+            </div>
+            <div class="card-body">
+                <div class="quick-actions-grid">
+                    {% if user.profile.can_edit_patients %}
+                        <a href="/patient/add/" class="quick-action-card">
+                            <div class="quick-action-icon">👤</div>
+                            <div class="quick-action-title">Новый пациент</div>
+                            <div class="quick-action-desc">Добавить пациента в систему</div>
+                        </a>
+                    {% endif %}
+                    
+                    {% if user.profile.can_view_all_patients %}
+                        <a href="/patients/" class="quick-action-card">
+                            <div class="quick-action-icon">👥</div>
+                            <div class="quick-action-title">Все пациенты</div>
+                            <div class="quick-action-desc">Просмотр списка пациентов</div>
+                        </a>
+                    {% endif %}
+                    
+                    <a href="/indicators/" class="quick-action-card">
+                        <div class="quick-action-icon">⚙️</div>
+                        <div class="quick-action-title">Настройки</div>
+                        <div class="quick-action-desc">Управление индикаторами</div>
+                    </a>
+                    
+                    {% if user.profile.can_view_all_patients %}
+                        <a href="/patients/" class="quick-action-card">
+                            <div class="quick-action-icon">📊</div>
+                            <div class="quick-action-title">Аналитика</div>
+                            <div class="quick-action-desc">Диаграммы и отчеты</div>
+                        </a>
+                    {% endif %}
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <script>
+        // Add animation delays to stats cards
+        document.addEventListener('DOMContentLoaded', function() {
+            const cards = document.querySelectorAll('.stat-card');
+            cards.forEach((card, index) => {
+                card.style.animationDelay = `${index * 0.1}s`;
+            });
+        });
+    </script>
+</body>
+</html>
