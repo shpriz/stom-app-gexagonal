@@ -2,6 +2,31 @@ from django import forms
 from .models import Schema, Indicator
 
 
+class SchemaForm(forms.ModelForm):
+    class Meta:
+        model = Schema
+        fields = ['name', 'description', 'order', 'is_active']
+        widgets = {
+            'name': forms.TextInput(attrs={
+                'class': 'form-control', 
+                'placeholder': 'Название схемы',
+                'required': True
+            }),
+            'description': forms.Textarea(attrs={
+                'class': 'form-control', 
+                'rows': 4, 
+                'placeholder': 'Описание схемы (необязательно)'
+            }),
+            'order': forms.NumberInput(attrs={
+                'class': 'form-control', 
+                'min': '1', 
+                'max': '100',
+                'placeholder': 'Порядок отображения'
+            }),
+            'is_active': forms.CheckboxInput(attrs={'class': 'form-check-input'}),
+        }
+
+
 class IndicatorForm(forms.ModelForm):
     class Meta:
         model = Indicator

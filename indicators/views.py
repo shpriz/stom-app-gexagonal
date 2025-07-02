@@ -2,7 +2,7 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
 from django.db import models
 from .models import Schema, Indicator, ScoringRange
-from .forms import IndicatorForm
+from .forms import IndicatorForm, SchemaForm
 
 
 def indicator_list(request):
@@ -92,29 +92,20 @@ def schema_list(request):
 def add_schema(request):
     """Add new schema"""
     if request.method == 'POST':
-        name = request.POST.get('name')
-        description = request.POST.get('description', '')
-        order = request.POST.get('order', 1)
-        is_active = request.POST.get('is_active') == 'on'
-        
-        if name:
-            schema = Schema.objects.create(
-                name=name,
-                description=description,
-                order=int(order),
-                is_active=is_active
-            )
-            messages.success(request, f'Schema "{schema.name}" added successfully!')
+        form = SchemaForm(request.POST)
+        if form.is_valid():
+            schema = form.save()
+            messages.success(request, f'Схема "{schema.name}" успешно добавлена!')
             return redirect('schema_list')
-        else:
-            messages.error(request, 'Schema name is required.')
-    
-    # Get next order number
-    last_schema = Schema.objects.order_by('-order').first()
-    next_order = (last_schema.order + 1) if last_schema else 1
+    else:
+        # Get next order number
+        last_schema = Schema.objects.order_by('-order').first()
+        next_order = (last_schema.order + 1) if last_schema else 1
+        
+        form = SchemaForm(initial={'order': next_order, 'is_active': True})
     
     context = {
-        'next_order': next_order,
+        'form': form,
         'is_edit': False
     }
     return render(request, 'indicators/add_schema.html', context)
@@ -125,16 +116,16 @@ def edit_schema(request, schema_id):
     schema = get_object_or_404(Schema, id=schema_id)
     
     if request.method == 'POST':
-        schema.name = request.POST.get('name', schema.name)
-        schema.description = request.POST.get('description', '')
-        schema.order = int(request.POST.get('order', schema.order))
-        schema.is_active = request.POST.get('is_active') == 'on'
-        schema.save()
-        
-        messages.success(request, f'Schema "{schema.name}" updated successfully!')
-        return redirect('schema_list')
+        form = SchemaForm(request.POST, instance=schema)
+        if form.is_valid():
+            form.save()
+            messages.success(request, f'Схема "{schema.name}" успешно обновлена!')
+            return redirect('schema_list')
+    else:
+        form = SchemaForm(instance=schema)
     
     context = {
+        'form': form,
         'schema': schema,
         'is_edit': True
     }
@@ -152,9 +143,20 @@ def delete_schema(request, schema_id):
         measurement_count += indicator.measurementvalue_set.count()
     
     if request.method == 'POST':
+        # Validate confirmation input
+        confirmation = request.POST.get('confirmation', '').strip()
+        if confirmation != schema.name:
+            messages.error(request, 'Название схемы введено неверно. Удаление отменено.')
+            context = {
+                'schema': schema,
+                'indicator_count': indicator_count,
+                'measurement_count': measurement_count
+            }
+            return render(request, 'indicators/confirm_delete_schema.html', context)
+        
         schema_name = schema.name
         schema.delete()
-        messages.success(request, f'Schema "{schema_name}" deleted successfully!')
+        messages.success(request, f'Схема "{schema_name}" успешно удалена!')
         return redirect('schema_list')
     
     context = {
