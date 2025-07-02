@@ -1,154 +1,519 @@
+{% load static %}
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ru">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Delete Indicator - Dental Office</title>
+    <title>Удаление индикатора - Стоматологическая практика</title>
+    <link rel="stylesheet" href="{% static 'css/friendly-styles.css' %}">
     <style>
-        body {
-            font-family: Arial, sans-serif;
-            margin: 20px;
-            background-color: #f5f5f5;
-        }
-        .header {
-            text-align: center;
-            margin-bottom: 30px;
-            background: white;
-            padding: 20px;
-            border-radius: 8px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-        }
-        .nav {
-            text-align: center;
-            margin-bottom: 20px;
-        }
-        .nav a {
-            margin: 0 15px;
-            padding: 10px 20px;
-            background: #007bff;
-            color: white;
-            text-decoration: none;
-            border-radius: 5px;
-        }
-        .nav a:hover {
-            background: #0056b3;
-        }
-        .delete-container {
+        .delete-form {
+            max-width: 700px;
+            margin: 0 auto;
             background: white;
             padding: 30px;
-            border-radius: 8px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-            max-width: 600px;
-            margin: 0 auto;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
         }
+        
+        .page-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 2px solid #e1e8ed;
+        }
+        
+        .page-title {
+            color: #e74c3c;
+            font-size: 28px;
+            font-weight: 700;
+            margin: 0;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        
+        .page-title::before {
+            content: "🗑️";
+            font-size: 32px;
+        }
+        
         .warning-box {
-            background: #f8d7da;
-            color: #721c24;
-            padding: 20px;
-            border-radius: 8px;
-            margin-bottom: 20px;
-            border-left: 4px solid #dc3545;
-        }
-        .indicator-info {
-            background: #f8f9fa;
-            padding: 15px;
-            border-radius: 5px;
-            margin: 20px 0;
-        }
-        .indicator-info h3 {
-            margin: 0 0 10px 0;
-            color: #333;
-        }
-        .indicator-info p {
-            margin: 5px 0;
-            color: #666;
-        }
-        .stats-alert {
             background: #fff3cd;
-            color: #856404;
-            padding: 15px;
-            border-radius: 5px;
-            margin: 15px 0;
-            border-left: 4px solid #ffc107;
+            border: 2px solid #ffc107;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 25px;
+            position: relative;
         }
-        .btn {
+        
+        .warning-box::before {
+            content: "⚠️";
+            font-size: 24px;
+            position: absolute;
+            top: 20px;
+            left: 20px;
+        }
+        
+        .warning-content {
+            margin-left: 40px;
+        }
+        
+        .warning-title {
+            color: #856404;
+            font-size: 18px;
+            font-weight: 600;
+            margin: 0 0 10px 0;
+        }
+        
+        .warning-text {
+            color: #856404;
+            font-size: 14px;
+            line-height: 1.5;
+            margin: 0;
+        }
+        
+        .danger-box {
+            background: #f8d7da;
+            border: 2px solid #e74c3c;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 25px;
+            position: relative;
+        }
+        
+        .danger-box::before {
+            content: "🚨";
+            font-size: 24px;
+            position: absolute;
+            top: 20px;
+            left: 20px;
+        }
+        
+        .danger-content {
+            margin-left: 40px;
+        }
+        
+        .danger-title {
+            color: #721c24;
+            font-size: 18px;
+            font-weight: 600;
+            margin: 0 0 10px 0;
+        }
+        
+        .danger-text {
+            color: #721c24;
+            font-size: 14px;
+            line-height: 1.5;
+            margin: 0;
+        }
+        
+        .indicator-details {
+            background: #f8f9fa;
+            border: 2px solid #e9ecef;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 25px;
+        }
+        
+        .indicator-details h3 {
+            color: #495057;
+            font-size: 18px;
+            font-weight: 600;
+            margin: 0 0 15px 0;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .indicator-details h3::before {
+            content: "📊";
+            font-size: 20px;
+        }
+        
+        .detail-item {
+            display: flex;
+            margin-bottom: 10px;
+            font-size: 14px;
+        }
+        
+        .detail-label {
+            font-weight: 600;
+            color: #495057;
+            min-width: 140px;
+        }
+        
+        .detail-value {
+            color: #6c757d;
+            flex: 1;
+        }
+        
+        .scoring-ranges {
+            margin-top: 15px;
+        }
+        
+        .range-item {
+            background: white;
+            border: 1px solid #dee2e6;
+            border-radius: 6px;
+            padding: 12px;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        
+        .range-condition {
+            font-weight: 500;
+            color: #495057;
+        }
+        
+        .range-score {
+            background: #007bff;
+            color: white;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+        
+        .form-actions {
+            display: flex;
+            gap: 15px;
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 1px solid #e1e8ed;
+            justify-content: space-between;
+        }
+        
+        .btn-danger {
+            background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%);
+            color: white;
             padding: 12px 24px;
             border: none;
-            border-radius: 4px;
-            font-size: 16px;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
             cursor: pointer;
+            transition: all 0.3s ease;
             text-decoration: none;
-            display: inline-block;
-            margin-right: 10px;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
         }
-        .btn-danger {
-            background: #dc3545;
-            color: white;
-        }
+        
         .btn-danger:hover {
-            background: #c82333;
+            background: linear-gradient(135deg, #c0392b 0%, #a93226 100%);
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(231, 76, 60, 0.3);
         }
+        
         .btn-secondary {
-            background: #6c757d;
-            color: white;
+            background: #f8f9fa;
+            color: #6c757d;
+            padding: 12px 24px;
+            border: 2px solid #e1e8ed;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
         }
+        
         .btn-secondary:hover {
-            background: #545b62;
+            background: #e2e6ea;
+            border-color: #dae0e5;
+            color: #495057;
         }
-        .form-actions {
+        
+        .confirmation-text {
+            font-size: 16px;
+            color: #495057;
+            margin-bottom: 20px;
             text-align: center;
-            margin-top: 30px;
+        }
+        
+        .confirmation-input {
+            margin-bottom: 20px;
+        }
+        
+        .confirmation-input label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #495057;
+            font-size: 14px;
+        }
+        
+        .confirmation-input input {
+            width: 100%;
+            padding: 12px 16px;
+            border: 2px solid #e1e8ed;
+            border-radius: 8px;
+            font-size: 14px;
+            transition: all 0.3s ease;
+            box-sizing: border-box;
+        }
+        
+        .confirmation-input input:focus {
+            outline: none;
+            border-color: #e74c3c;
+            box-shadow: 0 0 0 3px rgba(231, 76, 60, 0.1);
+        }
+        
+        .measurements-info {
+            background: #e7f3ff;
+            border: 2px solid #007bff;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 25px;
+            position: relative;
+        }
+        
+        .measurements-info::before {
+            content: "📈";
+            font-size: 24px;
+            position: absolute;
+            top: 20px;
+            left: 20px;
+        }
+        
+        .measurements-content {
+            margin-left: 40px;
+        }
+        
+        .measurements-title {
+            color: #0056b3;
+            font-size: 18px;
+            font-weight: 600;
+            margin: 0 0 10px 0;
+        }
+        
+        .measurements-text {
+            color: #0056b3;
+            font-size: 14px;
+            line-height: 1.5;
+            margin: 0;
         }
     </style>
 </head>
 <body>
-    <div class="header">
-        <h1>🗑️ Delete Indicator</h1>
-        <p>Confirm deletion of health indicator</p>
-    </div>
+    <!-- Navigation -->
+    <nav class="main-nav">
+        <div class="nav-container">
+            <div class="nav-brand">
+                <span class="nav-icon">🦷</span>
+                <span class="nav-title">Стоматологическая практика</span>
+            </div>
+            <div class="nav-menu">
+                <a href="/" class="nav-link">
+                    <span class="nav-link-icon">🏠</span>
+                    Главная
+                </a>
+                <a href="/patients/" class="nav-link">
+                    <span class="nav-link-icon">👥</span>
+                    Пациенты
+                </a>
+                <a href="/indicators/" class="nav-link active">
+                    <span class="nav-link-icon">📊</span>
+                    Индикаторы
+                </a>
+                <a href="/auth/logout/" class="nav-link">
+                    <span class="nav-link-icon">🚪</span>
+                    Выход
+                </a>
+            </div>
+        </div>
+    </nav>
 
-    <div class="nav">
-        <a href="/">Dashboard</a>
-        <a href="/patients/">All Patients</a>
-        <a href="/indicators/">All Indicators</a>
-    </div>
-
-    <div class="delete-container">
-        <div class="warning-box">
-            <h3>⚠️ Warning: This action cannot be undone!</h3>
-            <p>You are about to permanently delete this indicator and all associated measurement data.</p>
+    <!-- Main Content -->
+    <div class="container">
+        <!-- Breadcrumb -->
+        <div class="breadcrumb">
+            <a href="/">Главная</a>
+            <span class="breadcrumb-separator">›</span>
+            <a href="/indicators/">Индикаторы</a>
+            <span class="breadcrumb-separator">›</span>
+            <span class="breadcrumb-current">Удаление индикатора</span>
         </div>
 
-        <div class="indicator-info">
-            <h3>{{ indicator.name }}</h3>
-            {% if indicator.description %}
-                <p><strong>Description:</strong> {{ indicator.description }}</p>
+        <!-- Messages -->
+        {% include 'components/messages.html' %}
+
+        <div class="delete-form">
+            <div class="page-header">
+                <h1 class="page-title">Удаление индикатора</h1>
+            </div>
+            
+            <div class="danger-box">
+                <div class="danger-content">
+                    <h3 class="danger-title">Внимание! Необратимое действие</h3>
+                    <p class="danger-text">Удаление индикатора приведет к безвозвратной потере всех данных измерений пациентов по этому индикатору. Это действие нельзя отменить.</p>
+                </div>
+            </div>
+            
+            <div class="indicator-details">
+                <h3>Информация об индикаторе</h3>
+                <div class="detail-item">
+                    <span class="detail-label">Название:</span>
+                    <span class="detail-value"><strong>{{ indicator.name }}</strong></span>
+                </div>
+                <div class="detail-item">
+                    <span class="detail-label">Схема:</span>
+                    <span class="detail-value">{{ indicator.schema.name }}</span>
+                </div>
+                <div class="detail-item">
+                    <span class="detail-label">Описание:</span>
+                    <span class="detail-value">{{ indicator.description|default:"Нет описания" }}</span>
+                </div>
+                <div class="detail-item">
+                    <span class="detail-label">Единица измерения:</span>
+                    <span class="detail-value">{{ indicator.unit|default:"Не указана" }}</span>
+                </div>
+                <div class="detail-item">
+                    <span class="detail-label">Диапазон значений:</span>
+                    <span class="detail-value">{{ indicator.min_value }} - {{ indicator.max_value }}</span>
+                </div>
+                <div class="detail-item">
+                    <span class="detail-label">Статус:</span>
+                    <span class="detail-value">
+                        {% if indicator.is_active %}
+                            <span style="color: #28a745;">✅ Активный</span>
+                        {% else %}
+                            <span style="color: #6c757d;">❌ Неактивный</span>
+                        {% endif %}
+                    </span>
+                </div>
+                
+                {% if scoring_ranges %}
+                    <div class="scoring-ranges">
+                        <div class="detail-item">
+                            <span class="detail-label">Диапазоны оценки:</span>
+                            <span class="detail-value"><strong>{{ scoring_ranges|length }} диапазон(ов)</strong></span>
+                        </div>
+                        {% for range in scoring_ranges %}
+                            <div class="range-item">
+                                <span class="range-condition">
+                                    {% if range.range_type == 'normal' %}
+                                        {{ range.min_value }} - {{ range.max_value }}
+                                    {% elif range.range_type == 'exact' %}
+                                        = {{ range.min_value }}
+                                    {% elif range.range_type == 'gte' %}
+                                        ≥ {{ range.min_value }}
+                                    {% elif range.range_type == 'lt' %}
+                                        < {{ range.max_value }}
+                                    {% endif %}
+                                </span>
+                                <span class="range-score">{{ range.score }} балл(ов)</span>
+                            </div>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <div class="detail-item">
+                        <span class="detail-label">Диапазоны оценки:</span>
+                        <span class="detail-value">Не настроены</span>
+                    </div>
+                {% endif %}
+            </div>
+            
+            {% if measurements_count > 0 %}
+                <div class="measurements-info">
+                    <div class="measurements-content">
+                        <h3 class="measurements-title">Данные измерений</h3>
+                        <p class="measurements-text">
+                            По этому индикатору записано <strong>{{ measurements_count }} измерений</strong> от пациентов. 
+                            Все эти данные будут безвозвратно удалены вместе с индикатором.
+                        </p>
+                    </div>
+                </div>
             {% endif %}
-            <p><strong>Range:</strong> {{ indicator.min_value }} - {{ indicator.max_value }} {{ indicator.unit|default:"points" }}</p>
-            <p><strong>Status:</strong> {% if indicator.is_active %}Active{% else %}Inactive{% endif %}</p>
+            
+            <div class="warning-box">
+                <div class="warning-content">
+                    <h3 class="warning-title">Что будет удалено:</h3>
+                    <p class="warning-text">
+                        • Индикатор "{{ indicator.name }}"<br>
+                        • {{ scoring_ranges|length }} диапазон(ов) оценки<br>
+                        {% if measurements_count > 0 %}
+                            • {{ measurements_count }} измерений пациентов<br>
+                        {% endif %}
+                        • Все настройки и конфигурации<br>
+                        • Вся связанная история данных
+                    </p>
+                </div>
+            </div>
+            
+            <div class="confirmation-text">
+                Для подтверждения удаления введите название индикатора: <strong>"{{ indicator.name }}"</strong>
+            </div>
+            
+            <form method="post" id="deleteForm">
+                {% csrf_token %}
+                <div class="confirmation-input">
+                    <label for="confirmation">Подтверждение удаления:</label>
+                    <input type="text" id="confirmation" name="confirmation" 
+                           placeholder="Введите: {{ indicator.name }}" 
+                           autocomplete="off" required>
+                </div>
+                
+                <div class="form-actions">
+                    <a href="/indicators/" class="btn-secondary">
+                        <span>◀️</span>
+                        Отмена
+                    </a>
+                    <button type="submit" class="btn-danger" id="deleteButton" disabled>
+                        <span>🗑️</span>
+                        Удалить индикатор навсегда
+                    </button>
+                </div>
+            </form>
         </div>
-
-        {% if measurement_count > 0 %}
-            <div class="stats-alert">
-                <strong>⚠️ Data Impact:</strong>
-                <p>This indicator has <strong>{{ measurement_count }}</strong> associated measurement(s) that will also be deleted.</p>
-                <p>This will permanently remove patient measurement data from the system.</p>
-            </div>
-        {% else %}
-            <div style="background: #d4edda; color: #155724; padding: 15px; border-radius: 5px; margin: 15px 0;">
-                <p>✅ No measurement data will be affected - this indicator has not been used yet.</p>
-            </div>
-        {% endif %}
-
-        <form method="post" class="form-actions">
-            {% csrf_token %}
-            <button type="submit" class="btn btn-danger">
-                🗑️ Yes, Delete Indicator
-            </button>
-            <a href="{% url 'indicator_list' %}" class="btn btn-secondary">
-                ↩️ Cancel
-            </a>
-        </form>
     </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const confirmationInput = document.getElementById('confirmation');
+            const deleteButton = document.getElementById('deleteButton');
+            const indicatorName = "{{ indicator.name }}";
+            
+            // Auto-focus on confirmation input
+            confirmationInput.focus();
+            
+            // Enable delete button only when correct name is entered
+            confirmationInput.addEventListener('input', function() {
+                const isValid = this.value.trim() === indicatorName;
+                deleteButton.disabled = !isValid;
+                
+                if (isValid) {
+                    deleteButton.style.opacity = '1';
+                    deleteButton.style.cursor = 'pointer';
+                } else {
+                    deleteButton.style.opacity = '0.5';
+                    deleteButton.style.cursor = 'not-allowed';
+                }
+            });
+            
+            // Final confirmation on form submit
+            document.getElementById('deleteForm').addEventListener('submit', function(e) {
+                if (confirmationInput.value.trim() !== indicatorName) {
+                    e.preventDefault();
+                    alert('Название индикатора введено неверно!');
+                    confirmationInput.focus();
+                    return false;
+                }
+                
+                const confirmed = confirm('Вы абсолютно уверены, что хотите удалить этот индикатор? Это действие необратимо!');
+                if (!confirmed) {
+                    e.preventDefault();
+                }
+            });
+        });
+    </script>
 </body>
 </html>
