@@ -625,6 +625,235 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 /* ============================================================================
+   HERO SECTION
+   ============================================================================ */
+
+.hero-section {
+  background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+  border-radius: var(--radius-xl);
+  padding: var(--space-8);
+  color: var(--white);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: var(--space-8);
+  box-shadow: var(--shadow-lg);
+}
+
+.hero-content h1.hero-title {
+  font-size: var(--font-size-3xl);
+  font-weight: 700;
+  margin: 0 0 var(--space-2) 0;
+  color: var(--white);
+}
+
+.hero-subtitle {
+  font-size: var(--font-size-lg);
+  opacity: 0.9;
+  margin: 0;
+}
+
+.hero-stats {
+  display: flex;
+  gap: var(--space-6);
+}
+
+.stat-compact {
+  text-align: center;
+  min-width: 80px;
+}
+
+.stat-compact-number {
+  display: block;
+  font-size: var(--font-size-2xl);
+  font-weight: 700;
+  color: var(--white);
+}
+
+.stat-compact-label {
+  display: block;
+  font-size: var(--font-size-sm);
+  opacity: 0.8;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+/* ============================================================================
+   SECTION TITLES
+   ============================================================================ */
+
+.section-title {
+  font-size: var(--font-size-xl);
+  font-weight: 600;
+  color: var(--gray-900);
+  margin: 0 0 var(--space-4) 0;
+}
+
+/* ============================================================================
+   ACTION CARDS
+   ============================================================================ */
+
+.action-card {
+  background: var(--white);
+  border: 1px solid var(--gray-200);
+  border-radius: var(--radius-lg);
+  padding: var(--space-6);
+  text-decoration: none;
+  color: var(--gray-800);
+  transition: var(--transition);
+  position: relative;
+  display: block;
+  box-shadow: var(--shadow);
+}
+
+.action-card:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-lg);
+  border-color: var(--primary-light);
+  text-decoration: none;
+  color: var(--gray-800);
+}
+
+.action-card.primary {
+  background: linear-gradient(135deg, var(--primary-light) 0%, var(--primary) 100%);
+  color: var(--white);
+  border-color: var(--primary);
+}
+
+.action-card.primary:hover {
+  color: var(--white);
+}
+
+.action-icon {
+  font-size: var(--font-size-3xl);
+  margin-bottom: var(--space-3);
+  display: block;
+}
+
+.action-title {
+  font-size: var(--font-size-lg);
+  font-weight: 600;
+  margin: 0 0 var(--space-2) 0;
+}
+
+.action-desc {
+  font-size: var(--font-size-sm);
+  opacity: 0.8;
+  margin: 0 0 var(--space-4) 0;
+  line-height: 1.5;
+}
+
+.action-arrow {
+  position: absolute;
+  top: var(--space-4);
+  right: var(--space-4);
+  font-size: var(--font-size-lg);
+  opacity: 0.6;
+  transition: var(--transition);
+}
+
+.action-card:hover .action-arrow {
+  opacity: 1;
+  transform: translateX(4px);
+}
+
+/* ============================================================================
+   RECENT ITEMS
+   ============================================================================ */
+
+.recent-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.recent-item {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-3);
+  border-radius: var(--radius);
+  background: var(--gray-50);
+  transition: var(--transition);
+}
+
+.recent-item:hover {
+  background: var(--gray-100);
+}
+
+.recent-avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: var(--primary-light);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: var(--font-size-lg);
+  flex-shrink: 0;
+}
+
+.recent-info {
+  flex: 1;
+}
+
+.recent-name {
+  font-size: var(--font-size-sm);
+  font-weight: 500;
+  color: var(--gray-900);
+  margin-bottom: var(--space-1);
+}
+
+.recent-meta {
+  font-size: var(--font-size-xs);
+  color: var(--gray-500);
+}
+
+.recent-action {
+  flex-shrink: 0;
+}
+
+/* ============================================================================
+   TOOL GRID
+   ============================================================================ */
+
+.tool-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: var(--space-3);
+}
+
+.tool-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: var(--space-4);
+  border-radius: var(--radius);
+  background: var(--gray-50);
+  text-decoration: none;
+  color: var(--gray-700);
+  transition: var(--transition);
+  text-align: center;
+}
+
+.tool-item:hover {
+  background: var(--primary-bg);
+  color: var(--primary);
+  text-decoration: none;
+  transform: translateY(-1px);
+}
+
+.tool-icon {
+  font-size: var(--font-size-xl);
+  margin-bottom: var(--space-2);
+}
+
+.tool-name {
+  font-size: var(--font-size-sm);
+  font-weight: 500;
+}
+
+/* ============================================================================
    PATIENT CARDS
    ============================================================================ */
 

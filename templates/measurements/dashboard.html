@@ -105,67 +105,113 @@
         <!-- Messages Section -->
         {% include 'components/messages.html' %}
 
-        <!-- Dashboard Stats -->
-        <div class="grid grid-cols-4 mb-8">
-            <div class="stat-card">
-                <div class="stat-icon">👥</div>
-                <div class="stat-number">{{ total_patients }}</div>
-                <div class="stat-label">Всего пациентов</div>
+        <!-- Hero Welcome Section -->
+        <div class="hero-section mb-8">
+            <div class="hero-content">
+                <h1 class="hero-title">
+                    Добро пожаловать, {{ user.first_name|default:user.username }}!
+                </h1>
+                <p class="hero-subtitle">
+                    {% now "l, j F Y" %} • Управление стоматологической практикой
+                </p>
             </div>
-            <div class="stat-card">
-                <div class="stat-icon">📊</div>
-                <div class="stat-number">{{ total_measurements }}</div>
-                <div class="stat-label">Всего измерений</div>
-            </div>
-            <div class="stat-card">
-                <div class="stat-icon">⚡</div>
-                <div class="stat-number">{{ active_indicators }}</div>
-                <div class="stat-label">Активных индикаторов</div>
-            </div>
-            <div class="stat-card">
-                <div class="stat-icon">🎯</div>
-                <div class="stat-number">6</div>
-                <div class="stat-label">Макс. индикаторов</div>
+            <div class="hero-stats">
+                <div class="stat-compact">
+                    <span class="stat-compact-number">{{ total_patients }}</span>
+                    <span class="stat-compact-label">пациентов</span>
+                </div>
+                <div class="stat-compact">
+                    <span class="stat-compact-number">{{ total_measurements }}</span>
+                    <span class="stat-compact-label">измерений</span>
+                </div>
+                <div class="stat-compact">
+                    <span class="stat-compact-number">{{ active_indicators }}</span>
+                    <span class="stat-compact-label">индикаторов</span>
+                </div>
             </div>
         </div>
 
-        <!-- Quick Actions -->
-        <div class="card">
-            <div class="card-header">
-                <h3 class="card-title">🚀 Быстрые действия</h3>
-                <p class="card-subtitle">Основные операции системы</p>
-            </div>
-            <div class="card-body">
-                <div class="grid grid-cols-2 gap-4">
-                    {% if user.profile.can_edit_patients %}
-                        <a href="/patient/add/" class="btn btn-primary btn-lg w-full flex-col">
-                            <span class="text-2xl mb-2">👤</span>
-                            <span class="font-semibold">Новый пациент</span>
-                            <span class="text-xs opacity-80">Добавить пациента в систему</span>
-                        </a>
-                    {% endif %}
-                    
-                    {% if user.profile.can_view_all_patients %}
-                        <a href="/patients/" class="btn btn-outline btn-lg w-full flex-col">
-                            <span class="text-2xl mb-2">👥</span>
-                            <span class="font-semibold">Все пациенты</span>
-                            <span class="text-xs opacity-80">Просмотр списка пациентов</span>
-                        </a>
-                    {% endif %}
-                    
-                    <a href="/indicators/" class="btn btn-outline btn-lg w-full flex-col">
-                        <span class="text-2xl mb-2">⚙️</span>
-                        <span class="font-semibold">Настройки</span>
-                        <span class="text-xs opacity-80">Управление индикаторами</span>
+        <!-- Primary Actions -->
+        <div class="mb-8">
+            <h2 class="section-title">Основные действия</h2>
+            <div class="grid grid-cols-3 gap-6">
+                {% if user.profile.can_edit_patients %}
+                    <a href="/patient/add/" class="action-card primary">
+                        <div class="action-icon">👤</div>
+                        <h3 class="action-title">Новый пациент</h3>
+                        <p class="action-desc">Добавить пациента в систему и начать ведение медицинской карты</p>
+                        <div class="action-arrow">→</div>
                     </a>
-                    
-                    {% if user.profile.can_view_all_patients %}
-                        <a href="/patients/" class="btn btn-outline btn-lg w-full flex-col">
-                            <span class="text-2xl mb-2">📊</span>
-                            <span class="font-semibold">Аналитика</span>
-                            <span class="text-xs opacity-80">Диаграммы и отчеты</span>
+                {% endif %}
+                
+                {% if user.profile.can_view_all_patients %}
+                    <a href="/patients/" class="action-card">
+                        <div class="action-icon">👥</div>
+                        <h3 class="action-title">Все пациенты</h3>
+                        <p class="action-desc">Просмотр и управление существующими пациентами</p>
+                        <div class="action-arrow">→</div>
+                    </a>
+                {% endif %}
+                
+                <a href="/indicators/" class="action-card">
+                    <div class="action-icon">⚙️</div>
+                    <h3 class="action-title">Настройки</h3>
+                    <p class="action-desc">Управление индикаторами и конфигурация системы</p>
+                    <div class="action-arrow">→</div>
+                </a>
+            </div>
+        </div>
+
+        <!-- Recent Activity & Quick Access -->
+        <div class="grid grid-cols-2 gap-6">
+            <!-- Recent Patients -->
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title">📋 Недавние пациенты</h3>
+                    <a href="/patients/" class="text-primary text-sm font-medium">Показать все</a>
+                </div>
+                <div class="card-body">
+                    <div class="recent-list">
+                        <div class="recent-item">
+                            <div class="recent-avatar">👤</div>
+                            <div class="recent-info">
+                                <div class="recent-name">Последние добавленные пациенты</div>
+                                <div class="recent-meta">будут отображаться здесь</div>
+                            </div>
+                            <div class="recent-action">
+                                <a href="/patients/" class="btn btn-sm btn-outline">Открыть</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Quick Tools -->
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title">🛠️ Быстрые инструменты</h3>
+                </div>
+                <div class="card-body">
+                    <div class="tool-grid">
+                        <a href="/indicators/" class="tool-item">
+                            <span class="tool-icon">📊</span>
+                            <span class="tool-name">Индикаторы</span>
                         </a>
-                    {% endif %}
+                        <a href="/schemas/" class="tool-item">
+                            <span class="tool-icon">📋</span>
+                            <span class="tool-name">Схемы</span>
+                        </a>
+                        {% if user.profile.can_view_all_patients %}
+                            <a href="/patients/" class="tool-item">
+                                <span class="tool-icon">📈</span>
+                                <span class="tool-name">Аналитика</span>
+                            </a>
+                        {% endif %}
+                        <a href="/auth/logout/" class="tool-item">
+                            <span class="tool-icon">🚪</span>
+                            <span class="tool-name">Выход</span>
+                        </a>
+                    </div>
                 </div>
             </div>
         </div>

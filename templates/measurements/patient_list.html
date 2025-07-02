@@ -4,7 +4,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Пациенты - Стоматологическая клиника</title>
-    <link rel="stylesheet" href="/static/css/styles.css">
+    <link rel="stylesheet" href="/static/css/modern-medical.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
         .patient-info h3::before {
             content: '👤';
@@ -124,18 +127,23 @@
 </head>
 <body>
     <!-- Header Navigation -->
-    <header class="medical-header">
-        <h1>👥 Пациенты</h1>
-        <p>Управление пациентами стоматологической клиники</p>
+    <header class="header">
+        <div class="container">
+            <div class="header-content">
+                <a href="/" class="logo">
+                    <span class="logo-icon">🦷</span>
+                    <span>Стоматологическая клиника</span>
+                </a>
+                
+                <nav class="nav">
+                    <a href="/" class="nav-link">🏠 Панель управления</a>
+                    <a href="/patients/" class="nav-link active">👥 Все пациенты</a>
+                    <a href="/indicators/" class="nav-link">⚙️ Настройки</a>
+                    <a href="/auth/logout/" class="btn btn-danger btn-sm">🚪 Выход</a>
+                </nav>
+            </div>
+        </div>
     </header>
-    
-    <div class="container">
-        <nav class="medical-nav">
-            <a href="/" class="nav-link">🏠 Панель управления</a>
-            <a href="/patients/" class="nav-link active">👥 Все пациенты</a>
-            <a href="/indicators/" class="nav-link">⚙️ Настройки</a>
-        </nav>
-    </div>
 
     <div class="container">
         <!-- Messages Section -->

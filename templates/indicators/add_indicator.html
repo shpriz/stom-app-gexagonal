@@ -5,22 +5,39 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% if is_edit %}Редактировать{% else %}Добавить{% endif %} индикатор - Стоматологическая практика</title>
-    <link rel="stylesheet" href="{% static 'css/styles.css' %}">
+    <link rel="stylesheet" href="{% static 'css/modern-medical.css' %}">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 </head>
 <body>
     <!-- Header Navigation -->
-    <header class="medical-header">
-        <h1>📊 {% if is_edit %}Редактировать индикатор{% else %}Добавить индикатор{% endif %}</h1>
-        <p>Управление показателями для измерений</p>
+    <header class="header">
+        <div class="container">
+            <div class="header-content">
+                <a href="/" class="logo">
+                    <span class="logo-icon">🦷</span>
+                    <span>Стоматологическая клиника</span>
+                </a>
+                
+                <nav class="nav">
+                    <a href="/" class="nav-link">🏠 Панель управления</a>
+                    <a href="/patients/" class="nav-link">👥 Пациенты</a>
+                    <a href="/indicators/" class="nav-link active">📊 Показатели</a>
+                    <a href="/schemas/" class="nav-link">📋 Схемы</a>
+                    <a href="/auth/logout/" class="btn btn-danger btn-sm">🚪 Выход</a>
+                </nav>
+            </div>
+        </div>
     </header>
     
     <div class="container">
-        <nav class="medical-nav">
-            <a href="/" class="nav-link">🏠 Панель управления</a>
-            <a href="/patients/" class="nav-link">👥 Пациенты</a>
-            <a href="/indicators/" class="nav-link active">📊 Показатели</a>
-            <a href="/schemas/" class="nav-link">📋 Схемы</a>
-        </nav>
+        <div class="hero-section mb-8" style="background: linear-gradient(135deg, var(--info) 0%, #0369A1 100%);">
+            <div class="hero-content">
+                <h1 class="hero-title">📊 {% if is_edit %}Редактировать индикатор{% else %}Добавить индикатор{% endif %}</h1>
+                <p class="hero-subtitle">Управление показателями для измерений пациентов</p>
+            </div>
+        </div>
     </div>
 
     <div class="container">
