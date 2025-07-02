@@ -112,6 +112,10 @@ STATICFILES_DIRS = [BASE_DIR / 'static']
 # Use WhiteNoise for serving static files in production
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
+# WhiteNoise settings for better static file handling
+WHITENOISE_USE_FINDERS = True
+WHITENOISE_AUTOREFRESH = True
+
 # Media files
 MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
@@ -135,11 +139,15 @@ SESSION_SAVE_EVERY_REQUEST = True  # Update session on every request
 # Security Settings for Production
 SECURE_BROWSER_XSS_FILTER = True
 SECURE_CONTENT_TYPE_NOSNIFF = True
-SECURE_HSTS_SECONDS = 31536000  # 1 year
-SECURE_HSTS_INCLUDE_SUBDOMAINS = True
-SECURE_HSTS_PRELOAD = True
-SECURE_SSL_REDIRECT = config('SECURE_SSL_REDIRECT', default=False, cast=bool)
+SECURE_HSTS_SECONDS = 0  # Disabled for HTTP
+SECURE_HSTS_INCLUDE_SUBDOMAINS = False  # Disabled for HTTP
+SECURE_HSTS_PRELOAD = False  # Disabled for HTTP
+SECURE_SSL_REDIRECT = False  # Disabled for HTTP
 X_FRAME_OPTIONS = 'DENY'  # Prevent clickjacking
+
+# Fix Cross-Origin-Opener-Policy for HTTP
+SECURE_CROSS_ORIGIN_OPENER_POLICY = None  # Disable for HTTP
+SECURE_REFERRER_POLICY = 'same-origin'
 
 # CSRF Settings
 CSRF_COOKIE_SECURE = False  # Set to False for HTTP
