@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Добавить пациента - Стоматологическая клиника</title>
-    <link rel="stylesheet" href="/static/css/friendly-styles.css">
+    <link rel="stylesheet" href="/static/css/styles.css">
     <style>
         .existing-patient-alert {
             background: linear-gradient(135deg, #fff3cd, #ffeaa7);
@@ -93,24 +93,26 @@
 </head>
 <body>
     <!-- Header Navigation -->
-    <header class="page-header">
-        <h1 class="page-title">👤 Добавить пациента</h1>
-        <p class="page-subtitle">Создание нового профиля пациента</p>
-        
-        <nav class="nav-bar mt-20">
+    <header class="medical-header">
+        <h1>👤 Добавить пациента</h1>
+        <p>Создание нового профиля пациента</p>
+    </header>
+    
+    <div class="container">
+        <nav class="medical-nav">
             <a href="/" class="nav-link">🏠 Панель управления</a>
             <a href="/patients/" class="nav-link">👥 Все пациенты</a>
             <a href="/patient/add/" class="nav-link">➕ Новый пациент</a>
             <a href="/indicators/" class="nav-link">⚙️ Настройки</a>
         </nav>
-    </header>
+    </div>
 
-    <div class="main-container">
+    <div class="container">
         <!-- Messages Section -->
         {% include 'components/messages.html' %}
         
         <!-- Form Content -->
-        <div class="form-container fade-in-up">
+        <div class="form-section">
             {% if existing_patient %}
                 <div class="existing-patient-alert">
                     <h4>⚠️ Пациент уже существует</h4>

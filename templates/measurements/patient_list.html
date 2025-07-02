@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Пациенты - Стоматологическая клиника</title>
-    <link rel="stylesheet" href="/static/css/friendly-styles.css">
+    <link rel="stylesheet" href="/static/css/styles.css">
     <style>
         .patient-info h3::before {
             content: '👤';
@@ -124,22 +124,24 @@
 </head>
 <body>
     <!-- Header Navigation -->
-    <header class="page-header">
-        <h1 class="page-title">👥 Пациенты</h1>
-        <p class="page-subtitle">Управление пациентами стоматологической клиники</p>
-        
-        <nav class="nav-bar mt-20">
+    <header class="medical-header">
+        <h1>👥 Пациенты</h1>
+        <p>Управление пациентами стоматологической клиники</p>
+    </header>
+    
+    <div class="container">
+        <nav class="medical-nav">
             <a href="/" class="nav-link">🏠 Панель управления</a>
-            <a href="/patients/" class="nav-link">👥 Все пациенты</a>
+            <a href="/patients/" class="nav-link active">👥 Все пациенты</a>
             <a href="/indicators/" class="nav-link">⚙️ Настройки</a>
         </nav>
-    </header>
+    </div>
 
-    <div class="main-container">
+    <div class="container">
         <!-- Messages Section -->
         {% include 'components/messages.html' %}
 
-        <div class="card fade-in-up">
+        <div class="card">
             <div class="card-body">
                 <div class="patients-header">
                     <div class="patients-count">

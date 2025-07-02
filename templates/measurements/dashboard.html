@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Панель управления - Стоматологическая клиника</title>
-    <link rel="stylesheet" href="/static/css/friendly-styles.css?v=2">
+    <link rel="stylesheet" href="/static/css/styles.css?v=2">
     <style>
         /* Quick Actions Styles */
         .quick-actions-grid {
@@ -65,12 +65,14 @@
 </head>
 <body>
     <!-- Header Navigation -->
-    <header class="page-header">
-        <h1 class="page-title">🦷 Стоматологическая клиника</h1>
-        <p class="page-subtitle">Система управления медицинской практикой</p>
-        
-        <nav class="nav-bar mt-20">
-            <a href="/" class="nav-link">🏠 Панель управления</a>
+    <header class="medical-header">
+        <h1>🦷 Стоматологическая клиника</h1>
+        <p>Система управления медицинской практикой</p>
+    </header>
+    
+    <div class="container">
+        <nav class="medical-nav">
+            <a href="/" class="nav-link active">🏠 Панель управления</a>
             {% if user.profile.can_view_all_patients %}
                 <a href="/patients/" class="nav-link">👥 Пациенты</a>
             {% endif %}
@@ -78,16 +80,16 @@
                 <a href="/patient/add/" class="nav-link">➕ Новый пациент</a>
             {% endif %}
             <a href="/indicators/" class="nav-link">⚙️ Настройки</a>
-            <a href="/auth/logout/" class="nav-link btn-danger">🚪 Выход</a>
+            <a href="/auth/logout/" class="btn btn-danger btn-sm">🚪 Выход</a>
         </nav>
-    </header>
+    </div>
 
-    <div class="main-container">
+    <div class="container">
         <!-- Messages Section -->
         {% include 'components/messages.html' %}
 
         <!-- Dashboard Stats -->
-        <section class="stats-grid fade-in-up">
+        <div class="stats-grid mb-6">
             <div class="stat-card">
                 <div class="stat-number">{{ total_patients }}</div>
                 <div class="stat-label">👥 Всего пациентов</div>
@@ -104,12 +106,12 @@
                 <div class="stat-number">6</div>
                 <div class="stat-label">🎯 Макс. индикаторов</div>
             </div>
-        </section>
+        </div>
 
         <!-- Quick Actions -->
-        <section class="card fade-in-up">
+        <div class="card">
             <div class="card-header">
-                🚀 Быстрые действия
+                <h3 class="mb-0">🚀 Быстрые действия</h3>
             </div>
             <div class="card-body">
                 <div class="quick-actions-grid">
@@ -144,7 +146,7 @@
                     {% endif %}
                 </div>
             </div>
-        </section>
+        </div>
     </div>
 
     <script>

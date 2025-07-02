@@ -5,28 +5,32 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% if is_edit %}Редактировать{% else %}Добавить{% endif %} схему - Стоматологическая практика</title>
-    <link rel="stylesheet" href="{% static 'css/friendly-styles.css' %}">
+    <link rel="stylesheet" href="{% static 'css/styles.css' %}">
 </head>
 <body>
     <!-- Header Navigation -->
-    <header class="page-header">
-        <h1 class="page-title">📋 {% if is_edit %}Редактировать схему{% else %}Добавить схему{% endif %}</h1>
-        <p class="page-subtitle">Управление группами показателей</p>
-        
-        <nav class="nav-bar mt-20">
+    <header class="medical-header">
+        <h1>📋 {% if is_edit %}Редактировать схему{% else %}Добавить схему{% endif %}</h1>
+        <p>Управление группами показателей</p>
+    </header>
+    
+    <div class="container">
+        <nav class="medical-nav">
             <a href="/" class="nav-link">🏠 Панель управления</a>
             <a href="/patients/" class="nav-link">👥 Пациенты</a>
             <a href="/indicators/" class="nav-link">📊 Показатели</a>
-            <a href="/schemas/" class="nav-link">📋 Схемы</a>
+            <a href="/schemas/" class="nav-link active">📋 Схемы</a>
         </nav>
-    </header>
+    </div>
 
-    <div class="main-container">
+    <div class="container">
         <!-- Messages Section -->
         {% include 'components/messages.html' %}
 
-        <div class="card fade-in-up">
-            <div class="card-body">
+        <div class="form-section">
+            <div class="form-section-title">
+                {% if is_edit %}Редактировать схему{% else %}Создать новую схему{% endif %}
+            </div>
             
             <div class="schema-info">
                 <h3>Что такое схема?</h3>
@@ -91,24 +95,20 @@
                     </div>
                 </div>
                 
-                <div class="form-actions">
-                    <button type="submit" class="btn-primary">
-                        <span>💾</span>
-                        {% if is_edit %}Обновить схему{% else %}Создать схему{% endif %}
+                <div class="btn-group">
+                    <button type="submit" class="btn btn-primary">
+                        💾 {% if is_edit %}Обновить схему{% else %}Создать схему{% endif %}
                     </button>
-                    <a href="/schemas/" class="btn-secondary">
-                        <span>❌</span>
-                        Отмена
+                    <a href="/schemas/" class="btn btn-secondary">
+                        ❌ Отмена
                     </a>
                     {% if is_edit %}
-                        <a href="{% url 'delete_schema' schema.id %}" class="btn-danger" onclick="return confirm('Вы уверены, что хотите удалить эту схему? Все связанные индикаторы также будут удалены.')">
-                            <span>🗑️</span>
-                            Удалить схему
+                        <a href="{% url 'delete_schema' schema.id %}" class="btn btn-danger" onclick="return confirm('Вы уверены, что хотите удалить эту схему? Все связанные индикаторы также будут удалены.')">
+                            🗑️ Удалить схему
                         </a>
                     {% endif %}
                 </div>
             </form>
-            </div>
         </div>
     </div>
 
