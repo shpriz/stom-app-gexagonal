@@ -11,131 +11,116 @@
 </head>
 <body>
     <!-- Header Navigation -->
-    <header class="page-header">
-        <h1 class="page-title">📋 {% if is_edit %}Редактировать измерение{% else %}Добавить измерение{% endif %}</h1>
-        <p class="page-subtitle">{{ patient.full_name }} - Ввод медицинских показателей</p>
-        
-        <nav class="nav-bar mt-20">
-            <a href="/" class="nav-link">🏠 Панель управления</a>
-            <a href="/patients/" class="nav-link">👥 Все пациенты</a>
-            <a href="/chart/{{ patient.id }}/" class="nav-link">📊 Диаграмма</a>
-            <a href="/indicators/" class="nav-link">⚙️ Настройки</a>
-        </nav>
+    <header class="header">
+        <div class="container">
+            <div class="header-content">
+                <a href="/" class="logo">
+                    <span class="logo-icon">🦷</span>
+                    <span>Стоматологическая клиника</span>
+                </a>
+                
+                <nav class="nav">
+                    <a href="/" class="nav-link">🏠 Панель управления</a>
+                    <a href="/patients/" class="nav-link">👥 Все пациенты</a>
+                    <a href="/chart/{{ patient.id }}/" class="nav-link active">📊 Диаграмма</a>
+                    <a href="/indicators/" class="nav-link">⚙️ Настройки</a>
+                    <a href="/schemas/" class="nav-link">📋 Схемы</a>
+                    <a href="/auth/logout/" class="btn btn-danger btn-sm">🚪 Выход</a>
+                </nav>
+            </div>
+        </div>
     </header>
 
-    <div class="main-container">
+    <div class="container">
         <!-- Messages Section -->
         {% include 'components/messages.html' %}
 
-        <!-- Form Content -->
-        <div class="form-container fade-in-up">
-            
-            {% if form.errors %}
-                <div class="error-container">
-                    <strong>❌ Пожалуйста, исправьте следующие ошибки:</strong>
-                    <ul>
-                        {% for field, errors in form.errors.items %}
-                            {% for error in errors %}
-                                <li>{{ field }}: {{ error }}</li>
-                            {% endfor %}
-                        {% endfor %}
-                    </ul>
+        <div class="card">
+            <div class="card-body">
+                <!-- Page Header -->
+                <div class="patients-header-combined">
+                    <div class="header-top">
+                        <div class="patients-count">
+                            📋 {% if is_edit %}Редактировать измерение{% else %}Добавить измерение{% endif %}
+                        </div>
+                        <div class="patients-count" style="font-size: var(--font-size-base);">
+                            👤 {{ patient.full_name }}
+                        </div>
+                    </div>
                 </div>
-            {% endif %}
+            
+                {% if form.errors %}
+                    <div class="alert alert-danger">
+                        <strong>❌ Пожалуйста, исправьте следующие ошибки:</strong>
+                        <ul class="mb-0">
+                            {% for field, errors in form.errors.items %}
+                                {% for error in errors %}
+                                    <li>{{ field }}: {{ error }}</li>
+                                {% endfor %}
+                            {% endfor %}
+                        </ul>
+                    </div>
+                {% endif %}
             
             <form method="post">
                 {% csrf_token %}
                 
                 {{ form.patient }}
                 
-                <div class="form-group">
-                    <label for="{{ form.schema.id_for_label }}" class="form-label">
-                        Схема измерения <span class="required-indicator">*</span>
-                    </label>
-                    {{ form.schema }}
-                    {% if form.schema.help_text %}
-                        <div class="form-help">💡 {{ form.schema.help_text }}</div>
-                    {% endif %}
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="{{ form.schema.id_for_label }}" class="form-label">
+                            Схема измерения <span class="required">*</span>
+                        </label>
+                        {{ form.schema }}
+                        {% if form.schema.help_text %}
+                            <div class="help-text">💡 {{ form.schema.help_text }}</div>
+                        {% endif %}
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="{{ form.measurement_date.id_for_label }}" class="form-label">
+                            Дата и время измерения <span class="required">*</span>
+                        </label>
+                        {{ form.measurement_date }}
+                    </div>
                 </div>
                 
                 <div class="form-group">
-                    <label for="{{ form.measurement_date.id_for_label }}" class="form-label">
-                        Дата и время измерения <span class="required-indicator">*</span>
-                    </label>
-                    {{ form.measurement_date }}
-                </div>
-                
-                <div class="form-group">
-                    <label class="form-label">
+                    <div class="checkbox-group">
                         {{ form.show_in_chart }}
-                        📊 Показывать на радарной диаграмме
-                    </label>
+                        <label for="{{ form.show_in_chart.id_for_label }}">
+                            📊 Показывать на радарной диаграмме
+                        </label>
+                    </div>
                 </div>
                 
-                <div class="indicators-section">
-                    <h3>Значения индикаторов</h3>
-                    <div class="indicators-grid">
-                        <!-- Left Column -->
-                        <div class="indicators-column">
-                            <div class="indicator-header">
-                                <div>🎯 Показатель</div>
-                                <div>📊 Значение</div>
-                                <div>⭐ Баллы</div>
-                            </div>
-                            
-                            {% for item in indicator_fields|slice:":3" %}
-                                <div class="indicator-item">
-                                    <div class="indicator-name">
+                <div class="form-section-wrapper">
+                    <div class="form-section-title">
+                        🎯 Значения показателей
+                    </div>
+                    
+                    <div class="indicator-grid">
+                        {% for item in indicator_fields %}
+                            <div class="indicator-item">
+                                <div class="indicator-info">
+                                    <label class="form-label">
                                         <strong>{{ item.indicator.name }}</strong>
                                         {% if item.indicator.description %}
-                                            <div class="indicator-description">
-                                                {{ item.indicator.description }}
-                                            </div>
+                                            <div class="help-text">{{ item.indicator.description }}</div>
                                         {% endif %}
-                                    </div>
-                                    
-                                    <div class="indicator-input">
-                                        {{ item.field }}
-                                    </div>
-                                    
-                                    <div class="score-display" id="score_{{ item.indicator.id }}">
-                                        <span class="score-value">0</span>
-                                        <span class="score-label">баллов</span>
-                                    </div>
+                                    </label>
                                 </div>
-                            {% endfor %}
-                        </div>
-                        
-                        <!-- Right Column -->
-                        <div class="indicators-column">
-                            <div class="indicator-header">
-                                <div>🎯 Показатель</div>
-                                <div>📊 Значение</div>
-                                <div>⭐ Баллы</div>
+                                
+                                <div class="indicator-input">
+                                    {{ item.field }}
+                                </div>
+                                
+                                <div class="score-display" id="score_{{ item.indicator.id }}">
+                                    <span class="score-value">0</span> <span class="text-xs">баллов</span>
+                                </div>
                             </div>
-                            
-                            {% for item in indicator_fields|slice:"3:" %}
-                                <div class="indicator-item">
-                                    <div class="indicator-name">
-                                        <strong>{{ item.indicator.name }}</strong>
-                                        {% if item.indicator.description %}
-                                            <div class="indicator-description">
-                                                {{ item.indicator.description }}
-                                            </div>
-                                        {% endif %}
-                                    </div>
-                                    
-                                    <div class="indicator-input">
-                                        {{ item.field }}
-                                    </div>
-                                    
-                                    <div class="score-display" id="score_{{ item.indicator.id }}">
-                                        <span class="score-value">0</span>
-                                        <span class="score-label">баллов</span>
-                                    </div>
-                                </div>
-                            {% endfor %}
-                        </div>
+                        {% endfor %}
                     </div>
                 </div>
                 
@@ -144,15 +129,16 @@
                     {{ form.notes }}
                 </div>
                 
-                <div class="measurement-form-actions">
-                    <button type="submit" class="btn btn-primary btn-lg">
+                <div class="d-flex gap-2 justify-content-end mt-4">
+                    <button type="submit" class="btn btn-success">
                         {% if is_edit %}✅ Обновить измерение{% else %}✅ Сохранить измерение{% endif %}
                     </button>
-                    <a href="/chart/{{ patient.id }}/" class="btn btn-warning btn-lg">
+                    <a href="/chart/{{ patient.id }}/" class="btn btn-secondary">
                         ❌ Отмена
                     </a>
                 </div>
             </form>
+            </div>
         </div>
     </div>
 
@@ -193,13 +179,12 @@
                 scoreDisplay.querySelector('.score-value').textContent = score;
                 scoreDisplay.classList.add('visible');
                 
-                // Add visual feedback
+                // Add visual feedback using CSS classes
+                input.classList.remove('score-positive', 'score-neutral');
                 if (score > 0) {
-                    input.style.borderColor = '#28a745';
-                    input.style.backgroundColor = '#f8fff9';
+                    input.classList.add('score-positive');
                 } else {
-                    input.style.borderColor = '#667eea';
-                    input.style.backgroundColor = '#f8f9ff';
+                    input.classList.add('score-neutral');
                 }
                 
             } catch (error) {
@@ -246,12 +231,16 @@
                 });
             }
 
-            // Add hover animations to indicator items
+            // Initialize indicator items
             const indicatorItems = document.querySelectorAll('.indicator-item');
-            indicatorItems.forEach((item, index) => {
-                // Staggered animation
-                item.style.animationDelay = `${index * 0.1}s`;
-                item.classList.add('fade-in-up');
+            indicatorItems.forEach((item) => {
+                // Add hover effects
+                item.addEventListener('mouseenter', () => {
+                    item.style.transform = 'translateY(-1px)';
+                });
+                item.addEventListener('mouseleave', () => {
+                    item.style.transform = 'translateY(0)';
+                });
             });
 
             // Initialize all score displays

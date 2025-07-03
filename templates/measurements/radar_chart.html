@@ -11,133 +11,47 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
-    <style>
-        .charts-container {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 20px;
-        }
-        
-        .schema-row {
-            display: flex;
-            margin-bottom: 40px;
-            gap: 20px;
-            background: white;
-            border-radius: 15px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-            overflow: hidden;
-        }
-        
-        .chart-section {
-            flex: 2.5;
-            padding: 20px;
-            min-height: 600px;
-        }
-        
-        .recommendations-section {
-            flex: 1;
-            padding: 20px;
-            background: #f8f9fa;
-            border-left: 3px solid #dee2e6;
-        }
-        
-        .schema-title {
-            font-size: 18px;
-            font-weight: bold;
-            text-align: center;
-            margin-bottom: 15px;
-            color: #333;
-        }
-        
-        .hexagon-chart {
-            width: 100%;
-            height: 900px;
-            margin: 20px 0;
-        }
-        
-        .risk-score {
-            text-align: center;
-            margin: 15px 0;
-            padding: 10px;
-            border-radius: 8px;
-            font-weight: bold;
-        }
-        
-        .risk-low { background-color: #d4edda; color: #155724; }
-        .risk-moderate { background-color: #fff3cd; color: #856404; }
-        .risk-high { background-color: #f8d7da; color: #721c24; }
-        
-        .recommendations {
-            font-size: 14px;
-            line-height: 1.6;
-        }
-        
-        .recommendation-item {
-            margin-bottom: 15px;
-            padding: 10px;
-            background: white;
-            border-radius: 8px;
-            border-left: 4px solid #007bff;
-        }
-        
-        .recommendation-title {
-            font-weight: bold;
-            color: #333;
-            margin-bottom: 5px;
-        }
-        
-        .chart-controls {
-            margin-bottom: 15px;
-            text-align: center;
-        }
-        
-        .measurement-selector {
-            margin: 3px;
-            padding: 8px 12px;
-            border: 2px solid #ddd;
-            border-radius: 8px;
-            background: white;
-            cursor: pointer;
-            font-size: 14px;
-            font-weight: 500;
-            transition: all 0.2s ease;
-        }
-        
-        .measurement-selector:hover {
-            background: #e9ecef;
-            border-color: #007bff;
-        }
-        
-        .measurement-selector.selected {
-            background: #007bff;
-            color: white;
-            border-color: #0056b3;
-        }
-        
-        .measurement-selector input[type="checkbox"] {
-            margin-right: 8px;
-            transform: scale(1.2);
-        }
-    </style>
 </head>
 <body>
     <!-- Header Navigation -->
-    <header class="page-header">
-        <h1 class="page-title">📊 Гексагональная диаграмма</h1>
-        <p class="page-subtitle">{{ patient.full_name }} - Анализ медицинских показателей по схемам</p>
-        
-        <nav class="nav-bar mt-20">
-            <a href="/" class="nav-link">🏠 Панель управления</a>
-            <a href="/patients/" class="nav-link">👥 Все пациенты</a>
-            <a href="/patient/edit/{{ patient.id }}/" class="nav-link">✏️ Редактировать</a>
-            <a href="/measurement/add/{{ patient.id }}/" class="nav-link">📋 Новое измерение</a>
-        </nav>
+    <header class="header">
+        <div class="container">
+            <div class="header-content">
+                <a href="/" class="logo">
+                    <span class="logo-icon">🦷</span>
+                    <span>Стоматологическая клиника</span>
+                </a>
+                
+                <nav class="nav">
+                    <a href="/" class="nav-link">🏠 Панель управления</a>
+                    <a href="/patients/" class="nav-link">👥 Все пациенты</a>
+                    <a href="/patient/edit/{{ patient.id }}/" class="nav-link">✏️ Редактировать</a>
+                    <a href="/measurement/add/{{ patient.id }}/" class="nav-link active">📋 Новое измерение</a>
+                    <a href="/indicators/" class="nav-link">⚙️ Настройки</a>
+                    <a href="/schemas/" class="nav-link">📋 Схемы</a>
+                    <a href="/auth/logout/" class="btn btn-danger btn-sm">🚪 Выход</a>
+                </nav>
+            </div>
+        </div>
     </header>
 
-    <div class="main-container">
+    <div class="container">
+        <!-- Messages Section -->
         {% include 'components/messages.html' %}
+
+        <!-- Page Header -->
+        <div class="patients-header-combined">
+            <div class="header-top">
+                <div class="patients-count">
+                    📊 Диаграмма пациента
+                </div>
+                <div class="patients-count" style="font-size: var(--font-size-base);">
+                    👤 {{ patient.full_name }}
+                </div>
+            </div>
+        </div>
         
-        <div class="charts-container" id="chartsContainer">
+        <div id="chartsContainer">
             <!-- Schema charts will be generated here -->
         </div>
     </div>
@@ -525,22 +439,10 @@
             // Create new legend
             const legend = document.createElement('div');
             legend.className = 'chart-legend';
-            legend.style.cssText = `
-                display: flex;
-                flex-wrap: wrap;
-                justify-content: center;
-                gap: 15px;
-                margin-top: 10px;
-                font-size: 12px;
-            `;
             
             measurements.forEach((measurement, index) => {
                 const legendItem = document.createElement('div');
-                legendItem.style.cssText = `
-                    display: flex;
-                    align-items: center;
-                    gap: 5px;
-                `;
+                legendItem.className = 'legend-item';
                 
                 const colorBox = document.createElement('div');
                 colorBox.style.cssText = `
@@ -766,26 +668,13 @@
                 if (!legend) {
                     legend = document.createElement('div');
                     legend.className = 'chart-legend';
-                    legend.style.cssText = `
-                        display: flex;
-                        flex-wrap: wrap;
-                        justify-content: center;
-                        gap: 15px;
-                        margin-top: 10px;
-                        font-size: 12px;
-                    `;
                     container.appendChild(legend);
                 }
                 
                 // Add mean line to legend if not exists
                 if (!legend.querySelector('.mean-legend-item')) {
                     const meanItem = document.createElement('div');
-                    meanItem.className = 'mean-legend-item';
-                    meanItem.style.cssText = `
-                        display: flex;
-                        align-items: center;
-                        gap: 5px;
-                    `;
+                    meanItem.className = 'mean-legend-item legend-item';
                     
                     meanItem.innerHTML = `
                         <div style="width: 20px; height: 3px; background-color: #ff6b35; border: 2px dashed #ff6b35;"></div>
@@ -841,11 +730,12 @@
                 // If no data, show message
                 if (!data.schemas.some(s => s.measurements && s.measurements.length > 0)) {
                     document.getElementById('chartsContainer').innerHTML = `
-                        <div class="schema-row">
-                            <div class="chart-section" style="text-align: center; padding: 40px;">
-                                <h3>📊 Нет данных для отображения</h3>
-                                <p>Добавьте измерения для пациента, чтобы увидеть диаграммы.</p>
-                                <a href="/measurement/add/${patientId}/" class="btn btn-primary">📋 Добавить измерение</a>
+                        <div class="card">
+                            <div class="card-body" style="text-align: center; padding: var(--space-16);">
+                                <div style="font-size: 4rem; margin-bottom: var(--space-6); opacity: 0.5;">📊</div>
+                                <h3 class="text-primary-dark" style="margin-bottom: var(--space-4);">Нет данных для отображения</h3>
+                                <p style="margin-bottom: var(--space-6); color: var(--gray-600);">Добавьте измерения для пациента, чтобы увидеть диаграммы.</p>
+                                <a href="/measurement/add/${patientId}/" class="btn btn-success">📋 Добавить измерение</a>
                             </div>
                         </div>
                     `;
@@ -894,6 +784,9 @@
                 <div class="chart-section">
                     <div class="schema-title">
                         ${schema.name}
+                        <a href="/measurement/export_pdf/${patientId}/?schema_id=${schema.id}" class="btn btn-primary btn-sm" style="margin-left: var(--space-3); font-size: var(--font-size-xs);">
+                            📄 PDF
+                        </a>
                     </div>
                     <div class="chart-controls">
                         <div style="margin-bottom: 10px; font-weight: bold;">📅 Выберите измерения для отображения:</div>
