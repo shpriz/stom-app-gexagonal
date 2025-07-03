@@ -317,7 +317,7 @@ def patient_list(request):
             patient.status_text = 'Нет измерений'
             patient.status_color = 'secondary'
     
-    total_patients = Patient.objects.count()
+    total_patients = Patient.objects.filter(doctor=request.user).count()
     showing_count = len(patients_page)
     
     context = {

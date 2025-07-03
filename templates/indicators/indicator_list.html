@@ -3,182 +3,93 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Показатели - Стоматологическая клиника</title>
+    <title>Настройки - Стоматологическая клиника</title>
     <link rel="stylesheet" href="/static/css/modern-medical.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <style>
-        .indicator-info h3::before {
-            content: '📊';
-            font-size: 24px;
-        }
-        .indicator-details {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 15px;
-            margin-bottom: 20px;
-        }
-        .detail-item {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            color: var(--text-secondary);
-            font-size: 14px;
-        }
-        .detail-icon {
-            font-size: 16px;
-            width: 20px;
-            text-align: center;
-        }
-        .schema-badge {
-            background: var(--info-gradient);
-            color: white;
-            padding: 4px 12px;
-            border-radius: 15px;
-            font-size: 12px;
-            font-weight: 600;
-            box-shadow: 0 2px 8px rgba(23, 162, 184, 0.3);
-        }
-        .indicator-actions {
-            display: flex;
-            gap: 10px;
-            flex-wrap: wrap;
-        }
-        .indicators-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 25px;
-            flex-wrap: wrap;
-            gap: 20px;
-        }
-        .indicators-count {
-            font-size: 18px;
-            color: var(--text-primary);
-            font-weight: 600;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-        .indicators-count::before {
-            content: '📊';
-            font-size: 24px;
-        }
-        .no-indicators {
-            text-align: center;
-            padding: 80px 20px;
-            color: var(--text-muted);
-        }
-        .no-indicators-icon {
-            font-size: 72px;
-            margin-bottom: 25px;
-            opacity: 0.5;
-        }
-        .no-indicators h3 {
-            color: var(--text-primary);
-            margin-bottom: 15px;
-            font-size: 28px;
-            font-weight: 600;
-        }
-        .no-indicators p {
-            font-size: 16px;
-            margin-bottom: 25px;
-        }
-        .status-badge {
-            padding: 3px 8px;
-            border-radius: 12px;
-            font-size: 11px;
-            font-weight: 600;
-            text-transform: uppercase;
-        }
-        .status-active {
-            background: #d4edda;
-            color: #155724;
-        }
-        .status-inactive {
-            background: #f8d7da;
-            color: #721c24;
-        }
-        .range-count {
-            background: var(--warning-gradient);
-            color: white;
-            padding: 2px 8px;
-            border-radius: 10px;
-            font-size: 11px;
-            font-weight: 600;
-        }
-    </style>
 </head>
 <body>
     <!-- Header Navigation -->
-    <header class="page-header">
-        <h1 class="page-title">📊 Показатели</h1>
-        <p class="page-subtitle">Управление показателями для измерений</p>
-        
-        <nav class="nav-bar mt-20">
-            <a href="/" class="nav-link">🏠 Панель управления</a>
-            <a href="/patients/" class="nav-link">👥 Пациенты</a>
-            <a href="/indicators/" class="nav-link">📊 Показатели</a>
-            <a href="/schemas/" class="nav-link">📋 Схемы</a>
-        </nav>
+    <header class="header">
+        <div class="container">
+            <div class="header-content">
+                <a href="/" class="logo">
+                    <span class="logo-icon">🦷</span>
+                    <span>Стоматологическая клиника</span>
+                </a>
+                
+                <nav class="nav">
+                    <a href="/" class="nav-link">🏠 Панель управления</a>
+                    <a href="/patients/" class="nav-link">👥 Все пациенты</a>
+                    <a href="/indicators/" class="nav-link active">⚙️ Настройки</a>
+                    <a href="/auth/logout/" class="btn btn-danger btn-sm">🚪 Выход</a>
+                </nav>
+            </div>
+        </div>
     </header>
 
-    <div class="main-container">
+    <div class="container">
         <!-- Messages Section -->
         {% include 'components/messages.html' %}
 
-        <div class="card fade-in-up">
+        <div class="card">
             <div class="card-body">
-                <div class="indicators-header">
-                    <div class="indicators-count">
-                        Всего показателей: {{ total_indicators }} 
-                        (активных: {{ active_indicators }})
+                <!-- Page Header & Filters -->
+                <div class="patients-header-combined">
+                    <div class="header-top">
+                        <div class="patients-count">
+                            Всего показателей: {{ total_indicators }} 
+                            (активных: {{ active_indicators }})
+                        </div>
+                        <div>
+                            <a href="/indicator/add/" class="btn btn-success btn-lg">
+                                ➕ Новый показатель
+                            </a>
+                        </div>
+                        <div class="page-size-controls">
+                            <span class="filter-label">Схемы:</span>
+                            <a href="/schemas/" class="page-size-btn">📋 Схемы</a>
+                        </div>
                     </div>
-                    <div class="page-size-controls">
-                        <a href="/indicator/add/" class="btn btn-primary btn-sm" style="transform: scale(1.3); margin-right: 25px;">
-                            ➕ Новый показатель
-                        </a>
-                    </div>
-                </div>
-                
-                <!-- Filter Controls -->
-                <div class="ai-filter-section">
-                    <div class="ai-filter-controls">
-                        <span class="filter-label">🔍 Фильтр:</span>
-                        <button class="ai-filter-btn active" onclick="filterIndicators('all')" data-filter="all">
-                            📊 Все
-                        </button>
-                        <button class="ai-filter-btn" onclick="filterIndicators('active')" data-filter="active">
-                            ✅ Активные
-                        </button>
-                        <button class="ai-filter-btn" onclick="filterIndicators('inactive')" data-filter="inactive">
-                            ❌ Неактивные
-                        </button>
-                        <button class="ai-filter-btn" onclick="filterIndicators('with-ranges')" data-filter="with-ranges">
-                            🎯 С диапазонами
-                        </button>
-                        <button class="ai-filter-btn" onclick="filterIndicators('no-ranges')" data-filter="no-ranges">
-                            ⚠️ Без диапазонов
-                        </button>
+                    
+                    <div class="header-bottom">
+                        <div class="ai-filter-controls">
+                            <span class="filter-label">Фильтр:</span>
+                            <button class="ai-filter-btn active" onclick="filterIndicators('all')" data-filter="all">
+                                📊 Все
+                            </button>
+                            <button class="ai-filter-btn" onclick="filterIndicators('active')" data-filter="active">
+                                ✅ Активные
+                            </button>
+                            <button class="ai-filter-btn" onclick="filterIndicators('inactive')" data-filter="inactive">
+                                ❌ Неактивные
+                            </button>
+                            <button class="ai-filter-btn" onclick="filterIndicators('with-ranges')" data-filter="with-ranges">
+                                🎯 С диапазонами
+                            </button>
+                            <button class="ai-filter-btn" onclick="filterIndicators('no-ranges')" data-filter="no-ranges">
+                                ⚠️ Без диапазонов
+                            </button>
+                        </div>
                     </div>
                 </div>
                 
                 {% if indicators %}
                     {% for indicator in indicators %}
-                        <div class="patient-card fade-in-up indicator-card" 
+                        <div class="patient-card indicator-card" 
                              data-status="{% if indicator.is_active %}active{% else %}inactive{% endif %}"
                              data-has-ranges="{% if indicator.scoring_ranges.count > 0 %}true{% else %}false{% endif %}">
                             <div class="patient-header">
-                                <div class="indicator-info">
+                                <div class="patient-info">
                                     <h3>{{ indicator.name }}</h3>
                                 </div>
-                                <div class="schema-badge">
+                                <div class="measurement-badge">
                                     📋 {{ indicator.schema.name|default:"Без схемы" }}
                                 </div>
                             </div>
                             
-                            <div class="indicator-details">
+                            <div class="patient-details">
                                 <div class="detail-item">
                                     <span class="detail-icon">📏</span>
                                     <span><strong>Мин/Макс:</strong> {{ indicator.min_value|default:"N/A" }} - {{ indicator.max_value|default:"N/A" }}</span>
@@ -188,7 +99,7 @@
                                         {% if indicator.is_active %}✅{% else %}❌{% endif %}
                                     </span>
                                     <span><strong>Статус:</strong> 
-                                        <span class="status-badge {% if indicator.is_active %}status-active{% else %}status-inactive{% endif %}">
+                                        <span class="status-badge {% if indicator.is_active %}status-green{% else %}status-red{% endif %}">
                                             {% if indicator.is_active %}Активен{% else %}Неактивен{% endif %}
                                         </span>
                                     </span>
@@ -196,7 +107,7 @@
                                 <div class="detail-item">
                                     <span class="detail-icon">🎯</span>
                                     <span><strong>Диапазоны:</strong> 
-                                        <span class="range-count">{{ indicator.scoring_ranges.count }}</span>
+                                        <span class="status-badge status-yellow">{{ indicator.scoring_ranges.count }}</span>
                                     </span>
                                 </div>
                                 {% if indicator.description %}
@@ -207,22 +118,24 @@
                                 {% endif %}
                             </div>
                             
-                            <div class="indicator-actions">
-                                <a href="/indicators/{{ indicator.id }}/scoring-ranges/" class="btn btn-info btn-sm">
+                            <div class="patient-actions">
+                                <a href="/indicators/{{ indicator.id }}/scoring-ranges/" class="btn btn-primary">
                                     🎯 Диапазоны
                                 </a>
-                                <a href="/indicator/edit/{{ indicator.id }}/" class="btn btn-warning btn-sm">
+                                <a href="/indicator/edit/{{ indicator.id }}/" class="btn btn-warning">
                                     ✏️ Изменить
                                 </a>
-                                <a href="/indicator/delete/{{ indicator.id }}/" class="btn btn-danger btn-sm">
+                                <a href="/indicator/delete/{{ indicator.id }}/" class="btn btn-danger">
                                     🗑️ Удалить
                                 </a>
                             </div>
                         </div>
                     {% endfor %}
+                    
+                    <!-- Pagination would go here if needed -->
                 {% else %}
-                    <div class="no-indicators">
-                        <div class="no-indicators-icon">📊</div>
+                    <div class="no-patients">
+                        <div class="no-patients-icon">📊</div>
                         <h3>Показателей пока нет</h3>
                         <p>Добавьте первый показатель для начала работы с системой</p>
                         <a href="/indicator/add/" class="btn btn-primary btn-lg">
@@ -284,7 +197,7 @@
         }
         
         function updateIndicatorCount(visibleCount, filterType) {
-            const counter = document.querySelector('.indicators-count');
+            const counter = document.querySelector('.patients-count');
             const filterNames = {
                 'all': 'Все показатели',
                 'active': 'Активные',
@@ -305,83 +218,5 @@
             });
         });
     </script>
-
-    <style>
-        /* Filter Controls */
-        .ai-filter-controls {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            flex-wrap: wrap;
-        }
-        
-        .ai-filter-btn {
-            padding: 6px 14px;
-            border: 2px solid #e9ecef;
-            border-radius: 18px;
-            background: white;
-            color: var(--text-secondary);
-            font-weight: 600;
-            transition: var(--transition);
-            font-size: 12px;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            gap: 4px;
-            white-space: nowrap;
-        }
-        
-        .ai-filter-btn:hover {
-            border-color: #667eea;
-            color: #667eea;
-            transform: translateY(-1px);
-            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.2);
-        }
-        
-        .ai-filter-btn.active {
-            background: var(--primary-gradient);
-            color: white;
-            border-color: transparent;
-            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
-        }
-        
-        .ai-filter-btn.active:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
-        }
-        
-        .ai-filter-section {
-            margin: 20px 0;
-            padding: 12px;
-            background: linear-gradient(135deg, #f8f9ff, #fff);
-            border-radius: var(--border-radius-small);
-            border: 1px solid #e3f2fd;
-        }
-        
-        .btn-sm {
-            padding: 6px 12px;
-            font-size: 12px;
-            min-width: auto;
-        }
-        
-        /* Responsive controls */
-        @media (max-width: 768px) {
-            .indicators-header {
-                flex-direction: column;
-                gap: 15px;
-                align-items: flex-start;
-            }
-            
-            .ai-filter-controls {
-                width: 100%;
-                justify-content: flex-start;
-            }
-            
-            .ai-filter-btn {
-                font-size: 11px;
-                padding: 5px 10px;
-            }
-        }
-    </style>
 </body>
 </html>

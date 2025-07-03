@@ -8,183 +8,95 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <style>
-        .schema-info h3::before {
-            content: '📋';
-            font-size: 24px;
-        }
-        .schema-details {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 15px;
-            margin-bottom: 20px;
-        }
-        .detail-item {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            color: var(--text-secondary);
-            font-size: 14px;
-        }
-        .detail-icon {
-            font-size: 16px;
-            width: 20px;
-            text-align: center;
-        }
-        .order-badge {
-            background: var(--warning-gradient);
-            color: white;
-            padding: 4px 12px;
-            border-radius: 15px;
-            font-size: 12px;
-            font-weight: 600;
-            box-shadow: 0 2px 8px rgba(255, 193, 7, 0.3);
-        }
-        .schema-actions {
-            display: flex;
-            gap: 10px;
-            flex-wrap: wrap;
-        }
-        .schemas-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 25px;
-            flex-wrap: wrap;
-            gap: 20px;
-        }
-        .schemas-count {
-            font-size: 18px;
-            color: var(--text-primary);
-            font-weight: 600;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-        .schemas-count::before {
-            content: '📋';
-            font-size: 24px;
-        }
-        .no-schemas {
-            text-align: center;
-            padding: 80px 20px;
-            color: var(--text-muted);
-        }
-        .no-schemas-icon {
-            font-size: 72px;
-            margin-bottom: 25px;
-            opacity: 0.5;
-        }
-        .no-schemas h3 {
-            color: var(--text-primary);
-            margin-bottom: 15px;
-            font-size: 28px;
-            font-weight: 600;
-        }
-        .no-schemas p {
-            font-size: 16px;
-            margin-bottom: 25px;
-        }
-        .status-badge {
-            padding: 3px 8px;
-            border-radius: 12px;
-            font-size: 11px;
-            font-weight: 600;
-            text-transform: uppercase;
-        }
-        .status-active {
-            background: #d4edda;
-            color: #155724;
-        }
-        .status-inactive {
-            background: #f8d7da;
-            color: #721c24;
-        }
-        .indicator-count {
-            background: var(--success-gradient);
-            color: white;
-            padding: 2px 8px;
-            border-radius: 10px;
-            font-size: 11px;
-            font-weight: 600;
-        }
-    </style>
 </head>
 <body>
     <!-- Header Navigation -->
-    <header class="page-header">
-        <h1 class="page-title">📋 Схемы</h1>
-        <p class="page-subtitle">Управление группами показателей</p>
-        
-        <nav class="nav-bar mt-20">
-            <a href="/" class="nav-link">🏠 Панель управления</a>
-            <a href="/patients/" class="nav-link">👥 Пациенты</a>
-            <a href="/indicators/" class="nav-link">📊 Показатели</a>
-            <a href="/schemas/" class="nav-link">📋 Схемы</a>
-        </nav>
+    <header class="header">
+        <div class="container">
+            <div class="header-content">
+                <a href="/" class="logo">
+                    <span class="logo-icon">🦷</span>
+                    <span>Стоматологическая клиника</span>
+                </a>
+                
+                <nav class="nav">
+                    <a href="/" class="nav-link">🏠 Панель управления</a>
+                    <a href="/patients/" class="nav-link">👥 Все пациенты</a>
+                    <a href="/indicators/" class="nav-link">⚙️ Настройки</a>
+                    <a href="/schemas/" class="nav-link active">📋 Схемы</a>
+                    <a href="/auth/logout/" class="btn btn-danger btn-sm">🚪 Выход</a>
+                </nav>
+            </div>
+        </div>
     </header>
 
-    <div class="main-container">
+    <div class="container">
         <!-- Messages Section -->
         {% include 'components/messages.html' %}
 
-        <div class="card fade-in-up">
+        <div class="card">
             <div class="card-body">
-                <div class="schemas-header">
-                    <div class="schemas-count">
-                        Всего схем: {{ total_schemas }}
-                        (активных: {{ active_schemas }})
+                <!-- Page Header & Filters -->
+                <div class="patients-header-combined">
+                    <div class="header-top">
+                        <div class="patients-count">
+                            Всего схем: {{ total_schemas }} 
+                            (активных: {{ active_schemas }})
+                        </div>
+                        <div>
+                            <a href="/schema/add/" class="btn btn-success btn-lg">
+                                ➕ Новая схема
+                            </a>
+                        </div>
+                        <div class="page-size-controls">
+                            <span class="filter-label">Настройки:</span>
+                            <a href="/indicators/" class="page-size-btn">⚙️ Показатели</a>
+                        </div>
                     </div>
-                    <div class="page-size-controls">
-                        <a href="/schema/add/" class="btn btn-primary btn-sm" style="transform: scale(1.3); margin-right: 50px;">
-                            ➕ Новая схема
-                        </a>
-                    </div>
-                </div>
-                
-                <!-- Filter Controls -->
-                <div class="ai-filter-section">
-                    <div class="ai-filter-controls">
-                        <span class="filter-label">🔍 Фильтр:</span>
-                        <button class="ai-filter-btn active" onclick="filterSchemas('all')" data-filter="all">
-                            📋 Все
-                        </button>
-                        <button class="ai-filter-btn" onclick="filterSchemas('active')" data-filter="active">
-                            ✅ Активные
-                        </button>
-                        <button class="ai-filter-btn" onclick="filterSchemas('inactive')" data-filter="inactive">
-                            ❌ Неактивные
-                        </button>
-                        <button class="ai-filter-btn" onclick="filterSchemas('with-indicators')" data-filter="with-indicators">
-                            📊 С показателями
-                        </button>
-                        <button class="ai-filter-btn" onclick="filterSchemas('empty')" data-filter="empty">
-                            ⚠️ Пустые
-                        </button>
+                    
+                    <div class="header-bottom">
+                        <div class="ai-filter-controls">
+                            <span class="filter-label">Фильтр:</span>
+                            <button class="ai-filter-btn active" onclick="filterSchemas('all')" data-filter="all">
+                                📋 Все
+                            </button>
+                            <button class="ai-filter-btn" onclick="filterSchemas('active')" data-filter="active">
+                                ✅ Активные
+                            </button>
+                            <button class="ai-filter-btn" onclick="filterSchemas('inactive')" data-filter="inactive">
+                                ❌ Неактивные
+                            </button>
+                            <button class="ai-filter-btn" onclick="filterSchemas('with-indicators')" data-filter="with-indicators">
+                                📊 С показателями
+                            </button>
+                            <button class="ai-filter-btn" onclick="filterSchemas('empty')" data-filter="empty">
+                                ⚠️ Пустые
+                            </button>
+                        </div>
                     </div>
                 </div>
                 
                 {% if schemas %}
                     {% for schema in schemas %}
-                        <div class="patient-card fade-in-up schema-card" 
+                        <div class="patient-card schema-card" 
                              data-status="{% if schema.is_active %}active{% else %}inactive{% endif %}"
                              data-has-indicators="{% if schema.indicators.count > 0 %}true{% else %}false{% endif %}">
                             <div class="patient-header">
-                                <div class="schema-info">
+                                <div class="patient-info">
                                     <h3>{{ schema.name }}</h3>
                                 </div>
-                                <div class="order-badge">
+                                <div class="measurement-badge">
                                     📊 Порядок: {{ schema.order }}
                                 </div>
                             </div>
                             
-                            <div class="schema-details">
+                            <div class="patient-details">
                                 <div class="detail-item">
                                     <span class="detail-icon">
                                         {% if schema.is_active %}✅{% else %}❌{% endif %}
                                     </span>
                                     <span><strong>Статус:</strong> 
-                                        <span class="status-badge {% if schema.is_active %}status-active{% else %}status-inactive{% endif %}">
+                                        <span class="status-badge {% if schema.is_active %}status-green{% else %}status-red{% endif %}">
                                             {% if schema.is_active %}Активна{% else %}Неактивна{% endif %}
                                         </span>
                                     </span>
@@ -192,8 +104,12 @@
                                 <div class="detail-item">
                                     <span class="detail-icon">📊</span>
                                     <span><strong>Показателей:</strong> 
-                                        <span class="indicator-count">{{ schema.indicators.count }}</span>
+                                        <span class="status-badge status-yellow">{{ schema.indicators.count }}</span>
                                     </span>
+                                </div>
+                                <div class="detail-item">
+                                    <span class="detail-icon">🔢</span>
+                                    <span><strong>Порядок:</strong> {{ schema.order }}</span>
                                 </div>
                                 {% if schema.description %}
                                 <div class="detail-item">
@@ -203,19 +119,19 @@
                                 {% endif %}
                             </div>
                             
-                            <div class="schema-actions">
-                                <a href="/schema/edit/{{ schema.id }}/" class="btn btn-warning btn-sm">
+                            <div class="patient-actions">
+                                <a href="/schema/edit/{{ schema.id }}/" class="btn btn-warning">
                                     ✏️ Изменить
                                 </a>
-                                <a href="/schema/delete/{{ schema.id }}/" class="btn btn-danger btn-sm">
+                                <a href="/schema/delete/{{ schema.id }}/" class="btn btn-danger">
                                     🗑️ Удалить
                                 </a>
                             </div>
                         </div>
                     {% endfor %}
                 {% else %}
-                    <div class="no-schemas">
-                        <div class="no-schemas-icon">📋</div>
+                    <div class="no-patients">
+                        <div class="no-patients-icon">📋</div>
                         <h3>Схем пока нет</h3>
                         <p>Добавьте первую схему для группировки показателей</p>
                         <a href="/schema/add/" class="btn btn-primary btn-lg">
@@ -277,7 +193,7 @@
         }
         
         function updateSchemaCount(visibleCount, filterType) {
-            const counter = document.querySelector('.schemas-count');
+            const counter = document.querySelector('.patients-count');
             const filterNames = {
                 'all': 'Все схемы',
                 'active': 'Активные',
@@ -298,83 +214,5 @@
             });
         });
     </script>
-
-    <style>
-        /* Filter Controls */
-        .ai-filter-controls {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            flex-wrap: wrap;
-        }
-        
-        .ai-filter-btn {
-            padding: 6px 14px;
-            border: 2px solid #e9ecef;
-            border-radius: 18px;
-            background: white;
-            color: var(--text-secondary);
-            font-weight: 600;
-            transition: var(--transition);
-            font-size: 12px;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            gap: 4px;
-            white-space: nowrap;
-        }
-        
-        .ai-filter-btn:hover {
-            border-color: #667eea;
-            color: #667eea;
-            transform: translateY(-1px);
-            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.2);
-        }
-        
-        .ai-filter-btn.active {
-            background: var(--primary-gradient);
-            color: white;
-            border-color: transparent;
-            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
-        }
-        
-        .ai-filter-btn.active:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
-        }
-        
-        .ai-filter-section {
-            margin: 20px 0;
-            padding: 12px;
-            background: linear-gradient(135deg, #f8f9ff, #fff);
-            border-radius: var(--border-radius-small);
-            border: 1px solid #e3f2fd;
-        }
-        
-        .btn-sm {
-            padding: 6px 12px;
-            font-size: 12px;
-            min-width: auto;
-        }
-        
-        /* Responsive controls */
-        @media (max-width: 768px) {
-            .schemas-header {
-                flex-direction: column;
-                gap: 15px;
-                align-items: flex-start;
-            }
-            
-            .ai-filter-controls {
-                width: 100%;
-                justify-content: flex-start;
-            }
-            
-            .ai-filter-btn {
-                font-size: 11px;
-                padding: 5px 10px;
-            }
-        }
-    </style>
 </body>
 </html>

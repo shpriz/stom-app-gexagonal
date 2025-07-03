@@ -19,6 +19,44 @@ A Django-based web application for managing a dental practice with patient visit
 
 ## Memories
 - Use `<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.js"></script>` for chart inclusion
+- **CRITICAL**: Always use unified CSS framework from `/static/css/modern-medical.css` - Complete design system for consistent styling across ALL pages
+- **NEVER** create custom CSS files or use inline styles - everything must use modern-medical.css classes
+
+## UI Design System Rules (MANDATORY)
+### Page Structure
+- **ALWAYS** use unified header: `<header class="header">` with `<div class="container">` and `<div class="header-content">`
+- **ALWAYS** use `<div class="container">` for page content
+- **ALWAYS** wrap content in `<div class="card"><div class="card-body">`
+- **NEVER** use old page-header, hero-section, or main-container structures
+
+### Navigation
+- Use standard nav structure with: 🏠 Панель управления, 👥 Все пациенты, ⚙️ Настройки, 📋 Схемы, 🚪 Выход
+- Mark active page with `nav-link active` class
+- Logout button uses `btn btn-danger btn-sm`
+
+### Buttons (CRITICAL - Follow Exactly)
+- **Edit actions**: `btn btn-warning` (orange #F59E0B with border)
+- **Add/Create actions**: `btn btn-success` (green)  
+- **Delete actions**: `btn btn-danger` (red)
+- **Cancel actions**: `btn btn-secondary` (gray)
+- **Button spacing**: Use `d-flex gap-2 justify-content-end mt-4` for button groups
+
+### Form Fields
+- **Input borders**: Light blue #a8c5f0 with hover effects (#7ba7e8)
+- Use `form-group` class for field containers
+- Use `help-text` class for field descriptions
+- Required fields marked with `<span class="required">*</span>`
+
+### Language
+- **ALL** interface text must be in Russian
+- Use "показатель" instead of "индикатор"
+- Use professional medical terminology
+
+### Layout Consistency
+- Page headers use `patients-header-combined` structure
+- Remove unnecessary banners and redundant navigation elements
+- Keep interfaces clean and focused
+- Use consistent spacing with mt-4, gap-2 classes
 
 ## Database Structure
 ### Core Models
@@ -260,6 +298,21 @@ A Django-based web application for managing a dental practice with patient visit
   - Small PDF export button positioned next to schema titles
   - Automatic multi-page layout with proper content flow
   - File naming: medical_report_[HISTORY_ID]_[SCHEMA]_[DATE].pdf
+✅ Complete UI modernization and design system unification:
+  - Created comprehensive modern-medical.css design framework
+  - Unified all pages to use consistent blue gradient theme
+  - Standardized navigation header across all pages
+  - Implemented consistent button styling with proper colors:
+    - btn-warning: Orange (#F59E0B) with darker border for "Edit" actions
+    - btn-success: Green for "Add/Create" actions  
+    - btn-danger: Red for "Delete" actions
+    - btn-secondary: Gray for "Cancel" actions
+  - Applied light blue input field borders (#a8c5f0) with hover effects
+  - Translated all interface text to Russian language
+  - Modernized page layouts using patients-header-combined structure
+  - Updated all forms to use consistent styling and spacing
+  - Removed redundant custom CSS and inline styles
+  - Achieved complete visual consistency across entire application
 
 ## Commands
 - `docker-compose up -d` - Start PostgreSQL container

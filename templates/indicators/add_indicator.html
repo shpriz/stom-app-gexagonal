@@ -32,32 +32,32 @@
     </header>
     
     <div class="container">
-        <div class="hero-section mb-8" style="background: linear-gradient(135deg, var(--info) 0%, #0369A1 100%);">
-            <div class="hero-content">
-                <h1 class="hero-title">📊 {% if is_edit %}Редактировать индикатор{% else %}Добавить индикатор{% endif %}</h1>
-                <p class="hero-subtitle">Управление показателями для измерений пациентов</p>
-            </div>
-        </div>
-    </div>
-
-    <div class="container">
         <!-- Messages Section -->
         {% include 'components/messages.html' %}
 
-        <div class="form-section">
-            
-            {% if form.errors %}
-                <div class="form-errors">
-                    <strong>Пожалуйста, исправьте следующие ошибки:</strong>
-                    <ul>
-                        {% for field, errors in form.errors.items %}
-                            {% for error in errors %}
-                                <li>{{ field }}: {{ error }}</li>
-                            {% endfor %}
-                        {% endfor %}
-                    </ul>
+        <div class="card">
+            <div class="card-body">
+                <!-- Page Header -->
+                <div class="patients-header-combined">
+                    <div class="header-top">
+                        <div class="patients-count">
+                            📊 {% if is_edit %}Редактировать показатель{% else %}Добавить новый показатель{% endif %}
+                        </div>
+                    </div>
                 </div>
-            {% endif %}
+            
+                {% if form.errors %}
+                    <div class="alert alert-danger">
+                        <strong>Пожалуйста, исправьте следующие ошибки:</strong>
+                        <ul class="mb-0">
+                            {% for field, errors in form.errors.items %}
+                                {% for error in errors %}
+                                    <li>{{ field }}: {{ error }}</li>
+                                {% endfor %}
+                            {% endfor %}
+                        </ul>
+                    </div>
+                {% endif %}
             
             <form method="post">
                 {% csrf_token %}
@@ -65,16 +65,16 @@
                 <div class="form-group">
                     <label for="{{ form.schema.id_for_label }}">Схема <span class="required">*</span></label>
                     {{ form.schema }}
-                    <div class="help-text">Выберите схему, к которой принадлежит этот индикатор</div>
+                    <div class="help-text">Выберите схему, к которой принадлежит этот показатель</div>
                     {% if form.schema.errors %}
                         <div class="error-message">{{ form.schema.errors.0 }}</div>
                     {% endif %}
                 </div>
                 
                 <div class="form-group">
-                    <label for="{{ form.name.id_for_label }}">Название индикатора <span class="required">*</span></label>
+                    <label for="{{ form.name.id_for_label }}">Название показателя <span class="required">*</span></label>
                     {{ form.name }}
-                    <div class="help-text">Уникальное название для этого индикатора здоровья в рамках схемы</div>
+                    <div class="help-text">Уникальное название для этого показателя здоровья в рамках схемы</div>
                     {% if form.name.errors %}
                         <div class="error-message">{{ form.name.errors.0 }}</div>
                     {% endif %}
@@ -83,7 +83,7 @@
                 <div class="form-group">
                     <label for="{{ form.description.id_for_label }}">Описание</label>
                     {{ form.description }}
-                    <div class="help-text">Необязательное подробное описание того, что измеряет этот индикатор</div>
+                    <div class="help-text">Подробное описание того, что измеряет этот показатель (необязательно)</div>
                     {% if form.description.errors %}
                         <div class="error-message">{{ form.description.errors.0 }}</div>
                     {% endif %}
@@ -93,7 +93,7 @@
                     <div class="form-group">
                         <label for="{{ form.min_value.id_for_label }}">Минимальное значение <span class="required">*</span></label>
                         {{ form.min_value }}
-                        <div class="help-text">Наименьшее возможное входное значение</div>
+                        <div class="help-text">Наименьшее возможное значение для ввода</div>
                         {% if form.min_value.errors %}
                             <div class="error-message">{{ form.min_value.errors.0 }}</div>
                         {% endif %}
@@ -102,18 +102,18 @@
                     <div class="form-group">
                         <label for="{{ form.max_value.id_for_label }}">Максимальное значение <span class="required">*</span></label>
                         {{ form.max_value }}
-                        <div class="help-text">Наибольшее возможное входное значение</div>
+                        <div class="help-text">Наибольшее возможное значение для ввода</div>
                         {% if form.max_value.errors %}
                             <div class="error-message">{{ form.max_value.errors.0 }}</div>
                         {% endif %}
                     </div>
                 </div>
                 
-                <div class="form-grid">
+                <div class="form-grid" style="grid-template-columns: 1fr 1fr 1fr;">
                     <div class="form-group">
                         <label for="{{ form.green_threshold.id_for_label }}">Порог зеленой зоны (%)</label>
                         {{ form.green_threshold }}
-                        <div class="help-text">Значения выше этого % находятся в зеленой зоне (низкий риск)</div>
+                        <div class="help-text">Значения выше этого процента в зеленой зоне (низкий риск)</div>
                         {% if form.green_threshold.errors %}
                             <div class="error-message">{{ form.green_threshold.errors.0 }}</div>
                         {% endif %}
@@ -122,47 +122,48 @@
                     <div class="form-group">
                         <label for="{{ form.yellow_threshold.id_for_label }}">Порог желтой зоны (%)</label>
                         {{ form.yellow_threshold }}
-                        <div class="help-text">Значения выше этого % находятся в желтой зоне (средний риск)</div>
+                        <div class="help-text">Значения выше этого процента в желтой зоне (средний риск)</div>
                         {% if form.yellow_threshold.errors %}
                             <div class="error-message">{{ form.yellow_threshold.errors.0 }}</div>
+                        {% endif %}
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="{{ form.unit.id_for_label }}">Единица измерения</label>
+                        {{ form.unit }}
+                        <div class="help-text">Например: баллы, мм, %, годы, мг и т.д.</div>
+                        {% if form.unit.errors %}
+                            <div class="error-message">{{ form.unit.errors.0 }}</div>
                         {% endif %}
                     </div>
                 </div>
                 
                 <div class="form-group">
-                    <label for="{{ form.unit.id_for_label }}">Единица измерения</label>
-                    {{ form.unit }}
-                    <div class="help-text">Например: баллы, мм, %, годы и т.д.</div>
-                    {% if form.unit.errors %}
-                        <div class="error-message">{{ form.unit.errors.0 }}</div>
-                    {% endif %}
-                </div>
-                
-                <div class="form-group">
                     <div class="checkbox-group">
                         {{ form.is_active }}
-                        <label for="{{ form.is_active.id_for_label }}">Активный индикатор</label>
+                        <label for="{{ form.is_active.id_for_label }}">Активный показатель</label>
                     </div>
-                    <div class="help-text">Только активные индикаторы отображаются в формах измерений</div>
+                    <div class="help-text">Только активные показатели отображаются в формах измерений</div>
                     {% if form.is_active.errors %}
                         <div class="error-message">{{ form.is_active.errors.0 }}</div>
                     {% endif %}
                 </div>
                 
-                <div class="form-actions">
-                    <button type="submit" class="btn-primary">
-                        <span>💾</span>
-                        {% if is_edit %}Обновить индикатор{% else %}Добавить индикатор{% endif %}
-                    </button>
-                    <a href="{% url 'indicator_list' %}" class="btn-secondary">
-                        <span>❌</span>
-                        Отмена
+                <div class="d-flex gap-2 justify-content-end mt-4">
+                    <a href="/indicators/" class="btn btn-secondary">
+                        ↩️ Отмена
                     </a>
                     {% if is_edit %}
-                        <a href="{% url 'delete_indicator' indicator.id %}" class="btn-danger">
-                            <span>🗑️</span>
-                            Удалить индикатор
+                        <a href="{% url 'delete_indicator' indicator.id %}" class="btn btn-danger">
+                            🗑️ Удалить
                         </a>
+                        <button type="submit" class="btn btn-warning">
+                            ✏️ Обновить показатель
+                        </button>
+                    {% else %}
+                        <button type="submit" class="btn btn-success">
+                            ➕ Добавить показатель
+                        </button>
                     {% endif %}
                 </div>
             </form>

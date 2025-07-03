@@ -8,122 +8,6 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <style>
-        .patient-info h3::before {
-            content: '👤';
-            font-size: 24px;
-        }
-        .patient-details {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 15px;
-            margin-bottom: 20px;
-        }
-        .detail-item {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            color: var(--text-secondary);
-            font-size: 14px;
-        }
-        .detail-icon {
-            font-size: 16px;
-            width: 20px;
-            text-align: center;
-        }
-        .measurement-badge {
-            background: var(--info-gradient);
-            color: white;
-            padding: 4px 12px;
-            border-radius: 15px;
-            font-size: 12px;
-            font-weight: 600;
-            box-shadow: 0 2px 8px rgba(23, 162, 184, 0.3);
-        }
-        .patient-actions {
-            display: flex;
-            gap: 10px;
-            flex-wrap: wrap;
-        }
-        .filter-controls {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            background: var(--bg-white);
-            padding: 15px 20px;
-            border-radius: var(--border-radius-small);
-            box-shadow: var(--shadow-light);
-            margin-bottom: 20px;
-        }
-        .filter-label {
-            font-weight: 600;
-            color: var(--text-primary);
-            margin-right: 10px;
-        }
-        .filter-btn {
-            padding: 8px 16px;
-            border: 2px solid #e9ecef;
-            border-radius: 20px;
-            background: white;
-            color: var(--text-secondary);
-            text-decoration: none;
-            font-weight: 600;
-            transition: var(--transition);
-            font-size: 14px;
-        }
-        .filter-btn:hover {
-            border-color: #667eea;
-            color: #667eea;
-            transform: translateY(-1px);
-            text-decoration: none;
-        }
-        .filter-btn.active {
-            background: var(--primary-gradient);
-            color: white;
-            border-color: transparent;
-            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
-        }
-        .patients-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 25px;
-            flex-wrap: wrap;
-            gap: 20px;
-        }
-        .patients-count {
-            font-size: 18px;
-            color: var(--text-primary);
-            font-weight: 600;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-        .patients-count::before {
-            content: '👥';
-            font-size: 24px;
-        }
-        .no-patients {
-            text-align: center;
-            padding: 80px 20px;
-            color: var(--text-muted);
-        }
-        .no-patients-icon {
-            font-size: 72px;
-            margin-bottom: 25px;
-            opacity: 0.5;
-        }
-        .no-patients h3 {
-            color: var(--text-primary);
-            margin-bottom: 15px;
-            font-size: 28px;
-            font-weight: 600;
-        }
-        .no-patients p {
-            font-size: 16px;
-            margin-bottom: 25px;
-        }
-    </style>
 </head>
 <body>
     <!-- Header Navigation -->
@@ -151,52 +35,54 @@
 
         <div class="card">
             <div class="card-body">
-                <div class="patients-header">
-                    <div class="patients-count">
-                        Страница {{ patients_page.number }} из {{ patients_page.paginator.num_pages }} 
-                        ({{ showing_count }} из {{ total_patients }} пациентов)
+                <!-- Page Header & Filters -->
+                <div class="patients-header-combined">
+                    <div class="header-top">
+                        <div class="patients-count">
+                            Страница {{ patients_page.number }} из {{ patients_page.paginator.num_pages }} 
+                            ({{ showing_count }} из {{ total_patients }} пациентов)
+                        </div>
+                        <div>
+                            <a href="/patient/add/" class="btn btn-success btn-lg">
+                                ➕ Новый пациент
+                            </a>
+                        </div>
+                        <div class="page-size-controls">
+                            <span class="filter-label">Показать:</span>
+                            <a href="?size=5{% if request.GET.page %}&page={{ request.GET.page }}{% endif %}" 
+                               class="page-size-btn {% if page_size == 5 %}active{% endif %}">5</a>
+                            <a href="?size=10{% if request.GET.page %}&page={{ request.GET.page }}{% endif %}" 
+                               class="page-size-btn {% if page_size == 10 %}active{% endif %}">10</a>
+                            <a href="?size=50{% if request.GET.page %}&page={{ request.GET.page }}{% endif %}" 
+                               class="page-size-btn {% if page_size == 50 %}active{% endif %}">50</a>
+                        </div>
                     </div>
-                    <div class="middle-controls">
-                        <a href="/patient/add/" class="btn btn-primary btn-sm" style="transform: scale(1.3); margin-right: 50px;">
-                            ➕ Новый пациент
-                        </a>
-                    </div>
-                    <div class="page-size-controls">
-                        <span class="filter-label">📊 Показать:</span>
-                        <a href="?size=5{% if request.GET.page %}&page={{ request.GET.page }}{% endif %}" 
-                           class="page-size-btn {% if page_size == 5 %}active{% endif %}">5</a>
-                        <a href="?size=10{% if request.GET.page %}&page={{ request.GET.page }}{% endif %}" 
-                           class="page-size-btn {% if page_size == 10 %}active{% endif %}">10</a>
-                        <a href="?size=50{% if request.GET.page %}&page={{ request.GET.page }}{% endif %}" 
-                           class="page-size-btn {% if page_size == 50 %}active{% endif %}">50</a>
-                    </div>
-                </div>
-                
-                <!-- AI Filter Controls -->
-                <div class="ai-filter-section">
-                    <div class="ai-filter-controls">
-                        <span class="filter-label">🤖 Умный фильтр:</span>
-                        <button class="ai-filter-btn active" onclick="filterPatients('all')" data-filter="all">
-                            👥 Все пациенты
-                        </button>
-                        <button class="ai-filter-btn" onclick="filterPatients('high-risk')" data-filter="high-risk">
-                            🔴 Высокий риск
-                        </button>
-                        <button class="ai-filter-btn" onclick="filterPatients('medium-risk')" data-filter="medium-risk">
-                            🟡 Средний риск
-                        </button>
-                        <button class="ai-filter-btn" onclick="filterPatients('low-risk')" data-filter="low-risk">
-                            🟢 Низкий риск
-                        </button>
-                        <button class="ai-filter-btn" onclick="filterPatients('no-data')" data-filter="no-data">
-                            ⚪ Без измерений
-                        </button>
+                    
+                    <div class="header-bottom">
+                        <div class="ai-filter-controls">
+                            <span class="filter-label">Умный фильтр:</span>
+                            <button class="ai-filter-btn active" onclick="filterPatients('all')" data-filter="all">
+                                👥 Все пациенты
+                            </button>
+                            <button class="ai-filter-btn" onclick="filterPatients('high-risk')" data-filter="high-risk">
+                                🔴 Высокий риск
+                            </button>
+                            <button class="ai-filter-btn" onclick="filterPatients('medium-risk')" data-filter="medium-risk">
+                                🟡 Средний риск
+                            </button>
+                            <button class="ai-filter-btn" onclick="filterPatients('low-risk')" data-filter="low-risk">
+                                🟢 Низкий риск
+                            </button>
+                            <button class="ai-filter-btn" onclick="filterPatients('no-data')" data-filter="no-data">
+                                ⚪ Без измерений
+                            </button>
+                        </div>
                     </div>
                 </div>
                 
                 {% if patients %}
                     {% for patient in patients %}
-                        <div class="patient-card fade-in-up" 
+                        <div class="patient-card" 
                              data-status="{{ patient.status }}" 
                              data-risk-level="{{ patient.status }}"
                              data-has-measurements="{% if patient.measurement_count > 0 %}true{% else %}false{% endif %}"
@@ -271,10 +157,10 @@
                             <div class="pagination">
                                 <!-- Previous Page -->
                                 {% if patients_page.has_previous %}
-                                    <a href="?page=1&size={{ page_size }}" class="pagination-btn pagination-first">
+                                    <a href="?page=1&size={{ page_size }}" class="pagination-btn">
                                         ⏮️ Первая
                                     </a>
-                                    <a href="?page={{ patients_page.previous_page_number }}&size={{ page_size }}" class="pagination-btn pagination-prev">
+                                    <a href="?page={{ patients_page.previous_page_number }}&size={{ page_size }}" class="pagination-btn">
                                         ◀️ Назад
                                     </a>
                                 {% endif %}
@@ -290,10 +176,10 @@
                                 
                                 <!-- Next Page -->
                                 {% if patients_page.has_next %}
-                                    <a href="?page={{ patients_page.next_page_number }}&size={{ page_size }}" class="pagination-btn pagination-next">
+                                    <a href="?page={{ patients_page.next_page_number }}&size={{ page_size }}" class="pagination-btn">
                                         Вперед ▶️
                                     </a>
-                                    <a href="?page={{ patients_page.paginator.num_pages }}&size={{ page_size }}" class="pagination-btn pagination-last">
+                                    <a href="?page={{ patients_page.paginator.num_pages }}&size={{ page_size }}" class="pagination-btn">
                                         Последняя ⏭️
                                     </a>
                                 {% endif %}
@@ -392,175 +278,5 @@
             });
         });
     </script>
-
-    <style>
-        /* 🤖 AI Filter Controls */
-        .ai-filter-controls {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            flex-wrap: wrap;
-        }
-        
-        .ai-filter-btn {
-            padding: 8px 16px;
-            border: 2px solid #e9ecef;
-            border-radius: 20px;
-            background: white;
-            color: var(--text-secondary);
-            font-weight: 600;
-            transition: var(--transition);
-            font-size: 13px;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            gap: 5px;
-            white-space: nowrap;
-        }
-        
-        .ai-filter-btn:hover {
-            border-color: #667eea;
-            color: #667eea;
-            transform: translateY(-1px);
-            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.2);
-        }
-        
-        .ai-filter-btn.active {
-            background: var(--primary-gradient);
-            color: white;
-            border-color: transparent;
-            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
-        }
-        
-        .ai-filter-btn.active:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
-        }
-        
-        /* 📄 Page Size Controls */
-        .page-size-controls {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            flex-wrap: wrap;
-        }
-        
-        .page-size-btn {
-            padding: 6px 12px;
-            border: 2px solid #e9ecef;
-            border-radius: 15px;
-            background: white;
-            color: var(--text-secondary);
-            text-decoration: none;
-            font-weight: 600;
-            transition: var(--transition);
-            font-size: 13px;
-            min-width: 35px;
-            text-align: center;
-        }
-        
-        .page-size-btn:hover {
-            border-color: #667eea;
-            color: #667eea;
-            transform: translateY(-1px);
-            text-decoration: none;
-        }
-        
-        .page-size-btn.active {
-            background: var(--primary-gradient);
-            color: white;
-            border-color: transparent;
-            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
-        }
-        
-        /* 📄 Pagination Controls */
-        .pagination-controls {
-            margin-top: 30px;
-            padding-top: 20px;
-            border-top: 2px solid #f0f0f0;
-        }
-        
-        .pagination {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            gap: 8px;
-            margin-bottom: 15px;
-            flex-wrap: wrap;
-        }
-        
-        .pagination-btn {
-            padding: 8px 12px;
-            border: 2px solid #e9ecef;
-            border-radius: 8px;
-            background: white;
-            color: var(--text-secondary);
-            text-decoration: none;
-            font-weight: 600;
-            transition: var(--transition);
-            font-size: 14px;
-            min-width: 40px;
-            text-align: center;
-        }
-        
-        .pagination-btn:hover {
-            border-color: #667eea;
-            color: #667eea;
-            transform: translateY(-1px);
-            text-decoration: none;
-            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.2);
-        }
-        
-        .pagination-current {
-            background: var(--primary-gradient);
-            color: white;
-            border-color: transparent;
-            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
-        }
-        
-        .pagination-info {
-            text-align: center;
-            color: var(--text-muted);
-            font-size: 14px;
-            font-weight: 500;
-        }
-        
-        .ai-filter-section {
-            margin: 20px 0;
-            padding: 15px;
-            background: linear-gradient(135deg, #f8f9ff, #fff);
-            border-radius: var(--border-radius-small);
-            border: 1px solid #e3f2fd;
-        }
-        
-        /* Responsive controls */
-        @media (max-width: 768px) {
-            .patients-header {
-                flex-direction: column;
-                gap: 15px;
-                align-items: flex-start;
-            }
-            
-            .ai-filter-controls, .page-size-controls {
-                width: 100%;
-                justify-content: flex-start;
-            }
-            
-            .ai-filter-btn, .page-size-btn {
-                font-size: 12px;
-                padding: 6px 10px;
-            }
-            
-            .pagination {
-                gap: 5px;
-            }
-            
-            .pagination-btn {
-                padding: 6px 10px;
-                font-size: 13px;
-                min-width: 35px;
-            }
-        }
-    </style>
 </body>
 </html>

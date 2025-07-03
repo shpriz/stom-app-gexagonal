@@ -7,21 +7,18 @@ from .models import Patient
 class PatientForm(forms.ModelForm):
     class Meta:
         model = Patient
-        fields = ['history_of_illness', 'first_name', 'last_name', 'patronymic', 'date_of_birth', 'phone_number', 'email', 'address']
+        fields = ['history_of_illness', 'last_name', 'first_name', 'patronymic', 'date_of_birth']
         widgets = {
             'history_of_illness': forms.TextInput(attrs={
                 'class': 'form-control', 
                 'maxlength': '10', 
-                'placeholder': 'Medical history number (required)',
+                'placeholder': 'Номер истории болезни',
                 'required': True
             }),
-            'first_name': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'First Name'}),
-            'last_name': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Last Name'}),
-            'patronymic': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Patronymic (optional)'}),
+            'first_name': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Имя'}),
+            'last_name': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Фамилия'}),
+            'patronymic': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Отчество (необязательно)'}),
             'date_of_birth': forms.DateInput(attrs={'class': 'form-control', 'type': 'date'}),
-            'phone_number': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Phone number'}),
-            'email': forms.EmailInput(attrs={'class': 'form-control', 'placeholder': 'Email (optional)'}),
-            'address': forms.Textarea(attrs={'class': 'form-control', 'rows': 3, 'placeholder': 'Address (optional)'}),
         }
     
     def __init__(self, *args, **kwargs):
@@ -33,7 +30,7 @@ class PatientForm(forms.ModelForm):
         history_number = self.cleaned_data.get('history_of_illness')
         
         if not history_number:
-            raise ValidationError("Medical history number is required.")
+            raise ValidationError("Номер истории болезни обязателен.")
         
         # Check if patient with this history number already exists for this doctor
         # Only check if we're creating a new patient (not editing)
@@ -42,9 +39,8 @@ class PatientForm(forms.ModelForm):
                 existing_patient = Patient.objects.get(history_of_illness=history_number, doctor=self.user)
                 self.existing_patient = existing_patient
                 raise ValidationError(
-                    f"Patient with history number '{history_number}' already exists: "
-                    f"{existing_patient.full_name} (DOB: {existing_patient.date_of_birth}). "
-                    f"Would you like to edit this patient instead?"
+                    f"Пациент с номером '{history_number}' уже существует: "
+                    f"{existing_patient.full_name} ({existing_patient.date_of_birth.strftime('%d.%m.%Y')})"
                 )
             except Patient.DoesNotExist:
                 pass  # This is good - no duplicate found
@@ -54,5 +50,5 @@ class PatientForm(forms.ModelForm):
     def clean_date_of_birth(self):
         date_of_birth = self.cleaned_data.get('date_of_birth')
         if date_of_birth and date_of_birth > timezone.now().date():
-            raise ValidationError("Date of birth cannot be in the future.")
+            raise ValidationError("Дата рождения не может быть в будущем.")
         return date_of_birth

@@ -8,63 +8,6 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <style>
-        /* Quick Actions Styles */
-        .quick-actions-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 20px;
-        }
-        .quick-action-card {
-            background: linear-gradient(135deg, #f8f9ff, #fff);
-            border: 1px solid #e3f2fd;
-            border-radius: 15px;
-            padding: 25px;
-            text-decoration: none;
-            color: inherit;
-            transition: all 0.3s ease;
-            text-align: center;
-            position: relative;
-            overflow: hidden;
-            display: block;
-        }
-        .quick-action-card::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            height: 4px;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            transition: all 0.3s ease;
-        }
-        .quick-action-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 8px 25px rgba(0,0,0,0.1);
-            text-decoration: none;
-            color: inherit;
-        }
-        .quick-action-card:hover::before {
-            height: 6px;
-            background: linear-gradient(135deg, #28a745, #20c997);
-        }
-        .quick-action-icon {
-            font-size: 32px;
-            margin-bottom: 15px;
-            display: block;
-        }
-        .quick-action-title {
-            font-size: 18px;
-            font-weight: 600;
-            color: #2c3e50;
-            margin-bottom: 10px;
-        }
-        .quick-action-desc {
-            font-size: 14px;
-            color: #6c757d;
-            line-height: 1.4;
-        }
-    </style>
 </head>
 <body>
     <!-- Header Navigation -->
@@ -83,11 +26,6 @@
                     {% if user.profile.can_view_all_patients %}
                         <a href="/patients/" class="nav-link">
                             👥 Пациенты
-                        </a>
-                    {% endif %}
-                    {% if user.profile.can_edit_patients %}
-                        <a href="/patient/add/" class="nav-link">
-                            ➕ Новый пациент
                         </a>
                     {% endif %}
                     <a href="/indicators/" class="nav-link">
@@ -134,7 +72,7 @@
         <!-- Primary Actions -->
         <div class="mb-8">
             <h2 class="section-title">Основные действия</h2>
-            <div class="grid grid-cols-3 gap-6">
+            <div class="grid grid-cols-1 grid-cols-md-2 grid-cols-lg-3 gap-6">
                 {% if user.profile.can_edit_patients %}
                     <a href="/patient/add/" class="action-card primary">
                         <div class="action-icon">👤</div>
@@ -163,25 +101,50 @@
         </div>
 
         <!-- Recent Activity & Quick Access -->
-        <div class="grid grid-cols-2 gap-6">
+        <div class="grid grid-cols-1 grid-cols-lg-2 gap-6">
             <!-- Recent Patients -->
             <div class="card">
-                <div class="card-header">
+                <div class="card-header flex justify-between items-center">
                     <h3 class="card-title">📋 Недавние пациенты</h3>
                     <a href="/patients/" class="text-primary text-sm font-medium">Показать все</a>
                 </div>
                 <div class="card-body">
                     <div class="recent-list">
-                        <div class="recent-item">
-                            <div class="recent-avatar">👤</div>
-                            <div class="recent-info">
-                                <div class="recent-name">Последние добавленные пациенты</div>
-                                <div class="recent-meta">будут отображаться здесь</div>
+                        {% if total_patients > 0 %}
+                            <div class="recent-item">
+                                <div class="recent-avatar">👥</div>
+                                <div class="recent-info">
+                                    <div class="recent-name">{{ total_patients }} пациентов в системе</div>
+                                    <div class="recent-meta">{{ total_measurements }} общих измерений</div>
+                                </div>
+                                <div class="recent-action">
+                                    <a href="/patients/" class="btn btn-sm btn-outline">Просмотреть</a>
+                                </div>
                             </div>
-                            <div class="recent-action">
-                                <a href="/patients/" class="btn btn-sm btn-outline">Открыть</a>
+                            {% if user.profile.can_edit_patients %}
+                                <div class="recent-item">
+                                    <div class="recent-avatar">➕</div>
+                                    <div class="recent-info">
+                                        <div class="recent-name">Добавить нового пациента</div>
+                                        <div class="recent-meta">Создать профиль и начать измерения</div>
+                                    </div>
+                                    <div class="recent-action">
+                                        <a href="/patient/add/" class="btn btn-sm btn-primary">Добавить</a>
+                                    </div>
+                                </div>
+                            {% endif %}
+                        {% else %}
+                            <div class="recent-item">
+                                <div class="recent-avatar">🏥</div>
+                                <div class="recent-info">
+                                    <div class="recent-name">Система готова к работе</div>
+                                    <div class="recent-meta">Добавьте первого пациента для начала</div>
+                                </div>
+                                <div class="recent-action">
+                                    <a href="/patient/add/" class="btn btn-sm btn-primary">Начать</a>
+                                </div>
                             </div>
-                        </div>
+                        {% endif %}
                     </div>
                 </div>
             </div>

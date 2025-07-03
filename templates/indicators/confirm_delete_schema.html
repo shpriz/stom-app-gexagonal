@@ -1,225 +1,157 @@
-{% load static %}
 <!DOCTYPE html>
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Удаление схемы - Стоматологическая практика</title>
-    <link rel="stylesheet" href="{% static 'css/modern-medical.css' %}">
+    <title>Удаление схемы - {{ schema.name }}</title>
+    <link rel="stylesheet" href="/static/css/modern-medical.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
         body {
-            font-family: Arial, sans-serif;
-            margin: 20px;
-            background-color: #f5f5f5;
+            background-color: #f8f9fa;
         }
-        .header {
-            text-align: center;
-            margin-bottom: 30px;
-            background: white;
+        .main-container {
+            max-width: 700px;
+            margin: 50px auto;
             padding: 20px;
-            border-radius: 8px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
         }
-        .nav {
-            text-align: center;
-            margin-bottom: 20px;
+        .card {
+            border: none;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
         }
-        .nav a {
-            margin: 0 15px;
-            padding: 10px 20px;
-            background: #007bff;
+        .card-header {
+            background: linear-gradient(135deg, #dc3545, #c82333);
             color: white;
-            text-decoration: none;
-            border-radius: 5px;
+            border-radius: 10px 10px 0 0 !important;
         }
-        .nav a:hover {
-            background: #0056b3;
+        .btn-danger {
+            background: linear-gradient(135deg, #dc3545, #c82333);
+            border: none;
         }
-        .delete-container {
-            background: white;
-            padding: 30px;
-            border-radius: 8px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-            max-width: 600px;
-            margin: 0 auto;
+        .btn-secondary {
+            background: linear-gradient(135deg, #6c757d, #5a6268);
+            border: none;
         }
-        .warning-box {
-            background: #f8d7da;
-            color: #721c24;
-            padding: 20px;
-            border-radius: 8px;
-            margin-bottom: 20px;
+        .alert-danger {
             border-left: 4px solid #dc3545;
         }
-        .schema-info {
+        .data-section {
             background: #f8f9fa;
             padding: 15px;
             border-radius: 5px;
+            margin: 15px 0;
+        }
+        .stats-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
             margin: 20px 0;
         }
-        .schema-info h3 {
-            margin: 0 0 10px 0;
-            color: #333;
-        }
-        .schema-info p {
-            margin: 5px 0;
-            color: #666;
-        }
-        .stats-alert {
-            background: #fff3cd;
-            color: #856404;
+        .stat-card {
+            background: white;
             padding: 15px;
-            border-radius: 5px;
-            margin: 15px 0;
-            border-left: 4px solid #ffc107;
-        }
-        .btn {
-            padding: 12px 24px;
-            border: none;
-            border-radius: 4px;
-            font-size: 16px;
-            cursor: pointer;
-            text-decoration: none;
-            display: inline-block;
-            margin-right: 10px;
-        }
-        .btn-danger {
-            background: #dc3545;
-            color: white;
-        }
-        .btn-danger:hover {
-            background: #c82333;
-        }
-        .btn-secondary {
-            background: #6c757d;
-            color: white;
-        }
-        .btn-secondary:hover {
-            background: #545b62;
-        }
-        .form-actions {
-            display: flex;
-            gap: 15px;
-            margin-top: 30px;
-            padding-top: 20px;
-            border-top: 1px solid #e1e8ed;
-            justify-content: space-between;
-        }
-        
-        .confirmation-text {
-            font-size: 16px;
-            color: #495057;
-            margin-bottom: 20px;
+            border-radius: 8px;
+            border: 1px solid #dee2e6;
             text-align: center;
         }
-        
-        .confirmation-input {
-            margin-bottom: 20px;
+        .stat-number {
+            font-size: 2rem;
+            font-weight: bold;
+            color: #dc3545;
         }
-        
-        .confirmation-input label {
-            display: block;
-            margin-bottom: 8px;
-            font-weight: 600;
-            color: #495057;
-            font-size: 14px;
-        }
-        
-        .confirmation-input input {
-            width: 100%;
-            padding: 12px 16px;
-            border: 2px solid #e1e8ed;
-            border-radius: 8px;
-            font-size: 14px;
-            transition: all 0.3s ease;
-            box-sizing: border-box;
-        }
-        
-        .confirmation-input input:focus {
-            outline: none;
-            border-color: #e74c3c;
-            box-shadow: 0 0 0 3px rgba(231, 76, 60, 0.1);
+        .stat-label {
+            color: #6c757d;
+            font-size: 0.9rem;
         }
     </style>
 </head>
 <body>
-    <!-- Header Navigation -->
-    <header class="page-header">
-        <h1 class="page-title">🗑️ Удаление схемы</h1>
-        <p class="page-subtitle">Подтверждение удаления схемы измерений</p>
-        
-        <nav class="nav-bar mt-20">
-            <a href="/" class="nav-link">🏠 Панель управления</a>
-            <a href="/patients/" class="nav-link">👥 Пациенты</a>
-            <a href="/indicators/" class="nav-link">📊 Показатели</a>
-            <a href="/schemas/" class="nav-link">📋 Схемы</a>
-        </nav>
-    </header>
-
     <div class="main-container">
-        <!-- Messages Section -->
-        {% include 'components/messages.html' %}
-
-        <div class="card fade-in-up">
+        <div class="card">
+            <div class="card-header">
+                <h4 class="mb-0">
+                    <i class="fas fa-exclamation-triangle me-2"></i>
+                    Подтверждение удаления схемы
+                </h4>
+            </div>
             <div class="card-body">
-        <div class="warning-box">
-            <h3>⚠️ Warning: This action cannot be undone!</h3>
-            <p>You are about to permanently delete this schema and all associated indicators and measurement data.</p>
-        </div>
+                <div class="alert alert-danger">
+                    <strong>⚠️ ПРЕДУПРЕЖДЕНИЕ:</strong> Это действие навсегда удалит схему и ВСЕ связанные данные. Это невозможно отменить!
+                </div>
+                
+                <div class="data-section">
+                    <h5>Информация о схеме:</h5>
+                    <ul class="list-unstyled">
+                        <li><strong>Название:</strong> {{ schema.name }}</li>
+                        {% if schema.description %}
+                        <li><strong>Описание:</strong> {{ schema.description }}</li>
+                        {% endif %}
+                        <li><strong>Порядок отображения:</strong> {{ schema.order }}</li>
+                        <li><strong>Статус:</strong> {% if schema.is_active %}Активна{% else %}Неактивна{% endif %}</li>
+                        <li><strong>Создана:</strong> {{ schema.created_at|date:"d.m.Y H:i"|default:"N/A" }}</li>
+                        <li><strong>Последнее обновление:</strong> {{ schema.updated_at|date:"d.m.Y H:i"|default:"N/A" }}</li>
+                    </ul>
+                </div>
 
-        <div class="schema-info">
-            <h3>{{ schema.name }}</h3>
-            {% if schema.description %}
-                <p><strong>Description:</strong> {{ schema.description }}</p>
-            {% endif %}
-            <p><strong>Display Order:</strong> {{ schema.order }}</p>
-            <p><strong>Status:</strong> {% if schema.is_active %}Active{% else %}Inactive{% endif %}</p>
-        </div>
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-number">{{ indicator_count }}</div>
+                        <div class="stat-label">Показателей</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number">{{ measurement_count }}</div>
+                        <div class="stat-label">Значений измерений</div>
+                    </div>
+                </div>
 
-        {% if indicator_count > 0 or measurement_count > 0 %}
-            <div class="stats-alert">
-                <strong>⚠️ Data Impact:</strong>
-                <ul>
-                    {% if indicator_count > 0 %}
-                        <li>This schema has <strong>{{ indicator_count }}</strong> indicator(s) that will be deleted.</li>
-                    {% endif %}
-                    {% if measurement_count > 0 %}
-                        <li>This will permanently remove <strong>{{ measurement_count }}</strong> measurement value(s) from the system.</li>
-                    {% endif %}
-                </ul>
-                <p>This will permanently remove patient measurement data from the system.</p>
-            </div>
-        {% else %}
-            <div style="background: #d4edda; color: #155724; padding: 15px; border-radius: 5px; margin: 15px 0;">
-                <p>✅ No indicators or measurement data will be affected - this schema is empty.</p>
-            </div>
-        {% endif %}
+                <div class="alert alert-warning">
+                    <h6><strong>Следующие данные будут навсегда удалены:</strong></h6>
+                    <ul class="mb-0">
+                        <li>Схема "{{ schema.name }}" и её настройки</li>
+                        {% if indicator_count > 0 %}
+                        <li>{{ indicator_count }} показател{% if indicator_count == 1 %}ь{% elif indicator_count < 5 %}я{% else %}ей{% endif %} со всеми настройками</li>
+                        {% endif %}
+                        {% if measurement_count > 0 %}
+                        <li>{{ measurement_count }} значени{% if measurement_count == 1 %}е{% elif measurement_count < 5 %}я{% else %}й{% endif %} измерений пациентов</li>
+                        {% endif %}
+                        <li>Все данные диаграмм, связанные с этой схемой</li>
+                        <li>Любые связанные файлы или отчеты</li>
+                    </ul>
+                </div>
 
-        <div class="confirmation-text">
-            Для подтверждения удаления введите название схемы: <strong>"{{ schema.name }}"</strong>
-        </div>
-        
-        <form method="post" id="deleteForm">
-            {% csrf_token %}
-            <div class="confirmation-input">
-                <label for="confirmation">Подтверждение удаления:</label>
-                <input type="text" id="confirmation" name="confirmation" 
-                       placeholder="Введите: {{ schema.name }}" 
-                       autocomplete="off" required>
-            </div>
-            
-            <div class="form-actions">
-                <a href="/schemas/" class="btn btn-secondary">
-                    ↩️ Отмена
-                </a>
-                <button type="submit" class="btn btn-danger" id="deleteButton" disabled>
-                    🗑️ Удалить схему навсегда
-                </button>
-            </div>
-        </form>
+                {% if measurement_count > 0 %}
+                <div class="alert alert-info">
+                    <strong>💡 Альтернатива:</strong> Рассмотрите возможность экспорта данных схемы перед удалением, если вам нужно сохранить записи для соблюдения требований или отчетности.
+                </div>
+                {% endif %}
+
+                <p class="text-danger fw-bold">
+                    Для подтверждения удаления введите название схемы: <strong>"{{ schema.name }}"</strong>
+                </p>
+
+                <form method="post" id="deleteForm">
+                    {% csrf_token %}
+                    <div class="mb-3">
+                        <label for="confirmation" class="form-label">Подтверждение удаления:</label>
+                        <input type="text" class="form-control" id="confirmation" name="confirmation" 
+                               placeholder="Введите: {{ schema.name }}" 
+                               autocomplete="off" required>
+                    </div>
+                    
+                    <div class="d-flex gap-2 justify-content-end mt-4">
+                        <a href="/schemas/" class="btn btn-secondary">
+                            <i class="fas fa-arrow-left me-1"></i>
+                            Отмена
+                        </a>
+                        <button type="submit" class="btn btn-danger" id="deleteButton" disabled onclick="return confirm('Это навсегда удалит {{ schema.name }} и все связанные данные. Вы уверены?')">
+                            <i class="fas fa-trash me-1"></i>
+                            Да, удалить схему навсегда
+                        </button>
+                    </div>
+                </form>
             </div>
         </div>
     </div>
@@ -254,11 +186,6 @@
                     alert('Название схемы введено неверно!');
                     confirmationInput.focus();
                     return false;
-                }
-                
-                const confirmed = confirm('Вы абсолютно уверены, что хотите удалить эту схему? Это действие необратимо!');
-                if (!confirmed) {
-                    e.preventDefault();
                 }
             });
         });
