@@ -1,53 +1,24 @@
-<!DOCTYPE html>
-<html lang="ru">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>📋 {% if is_edit %}Редактировать измерение{% else %}Добавить измерение{% endif %} - {{ patient.full_name }}</title>
-    <link rel="stylesheet" href="/static/css/modern-medical.css">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-</head>
-<body>
-    <!-- Header Navigation -->
-    <header class="header">
-        <div class="container">
-            <div class="header-content">
-                <a href="/" class="logo">
-                    <span class="logo-icon">🦷</span>
-                    <span>Стоматологическая клиника</span>
-                </a>
-                
-                <nav class="nav">
-                    <a href="/" class="nav-link">🏠 Панель управления</a>
-                    <a href="/patients/" class="nav-link">👥 Все пациенты</a>
-                    <a href="/chart/{{ patient.id }}/" class="nav-link active">📊 Диаграмма</a>
-                    <a href="/indicators/" class="nav-link">⚙️ Настройки</a>
-                    <a href="/schemas/" class="nav-link">📋 Схемы</a>
-                    <a href="/auth/logout/" class="btn btn-danger btn-sm">🚪 Выход</a>
-                </nav>
+{% extends 'base.html' %}
+
+{% block title %}📋 {% if is_edit %}Редактировать измерение{% else %}Добавить измерение{% endif %} - {{ patient.full_name }}{% endblock %}
+
+{% block page_header %}
+    <!-- Page Header -->
+    <div class="patients-header-combined">
+        <div class="header-top">
+            <div class="patients-count">
+                📋 {% if is_edit %}Редактировать измерение{% else %}Добавить измерение{% endif %}
+            </div>
+            <div class="patients-count" style="font-size: var(--font-size-base);">
+                👤 {{ patient.full_name }}
             </div>
         </div>
-    </header>
+    </div>
+{% endblock %}
 
-    <div class="container">
-        <!-- Messages Section -->
-        {% include 'components/messages.html' %}
-
-        <div class="card">
-            <div class="card-body">
-                <!-- Page Header -->
-                <div class="patients-header-combined">
-                    <div class="header-top">
-                        <div class="patients-count">
-                            📋 {% if is_edit %}Редактировать измерение{% else %}Добавить измерение{% endif %}
-                        </div>
-                        <div class="patients-count" style="font-size: var(--font-size-base);">
-                            👤 {{ patient.full_name }}
-                        </div>
-                    </div>
-                </div>
+{% block content %}
+    <div class="card">
+        <div class="card-body">
             
                 {% if form.errors %}
                     <div class="alert alert-danger">
@@ -138,10 +109,11 @@
                     </a>
                 </div>
             </form>
-            </div>
         </div>
     </div>
+{% endblock %}
 
+{% block extra_js %}
     <script>
         // Cache for scoring ranges to avoid repeated API calls
         const scoringRangesCache = {};
@@ -252,5 +224,4 @@
             });
         });
     </script>
-</body>
-</html>
+{% endblock %}

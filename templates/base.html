@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Стоматологическая клиника{% endblock %}</title>
+    <link rel="stylesheet" href="/static/css/modern-medical.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    {% block extra_css %}{% endblock %}
+</head>
+<body>
+    <!-- Header Navigation -->
+    <header class="header">
+        <div class="container">
+            <div class="header-content">
+                <a href="/" class="logo">
+                    <span class="logo-icon">🦷</span>
+                    <span>Стоматологическая клиника</span>
+                </a>
+                
+                <nav class="nav">
+                    <a href="/" class="nav-link {% block nav_dashboard %}{% endblock %}">🏠 Панель управления</a>
+                    {% if user.profile.can_view_all_patients %}
+                        <a href="/patients/" class="nav-link {% block nav_patients %}{% endblock %}">👥 Все пациенты</a>
+                    {% endif %}
+                    <a href="/indicators/" class="nav-link {% block nav_indicators %}{% endblock %}">⚙️ Настройки</a>
+                    <a href="/schemas/" class="nav-link {% block nav_schemas %}{% endblock %}">📋 Схемы</a>
+                    <a href="/auth/logout/" class="btn btn-danger btn-sm">🚪 Выход</a>
+                </nav>
+            </div>
+        </div>
+    </header>
+
+    <div class="container">
+        <!-- Messages Section -->
+        {% include 'components/messages.html' %}
+
+        {% block page_header %}{% endblock %}
+
+        {% block content %}{% endblock %}
+    </div>
+
+    {% block extra_js %}{% endblock %}
+</body>
+</html>

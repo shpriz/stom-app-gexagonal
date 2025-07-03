@@ -1,0 +1,833 @@
+/*
+🏥 Medical Admin Glass Theme - Inspired by Modern Medical UI
+Professional glassmorphism design for Django admin interface
+*/
+
+/* ============================================================================
+   GLASS THEME VARIABLES
+   ============================================================================ */
+
+:root {
+  /* Medical Colors */
+  --medical-primary: #4F8CF6;
+  --medical-primary-dark: #3B82F6;
+  --medical-secondary: #6B7280;
+  --medical-success: #10B981;
+  --medical-warning: #F59E0B;
+  --medical-danger: #EF4444;
+  
+  /* Glass Effects */
+  --glass-bg: rgba(255, 255, 255, 0.25);
+  --glass-border: rgba(255, 255, 255, 0.18);
+  --glass-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
+  --glass-backdrop: blur(20px);
+  
+  /* Medical Glass Gradient */
+  --medical-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  --medical-gradient-light: linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.1) 100%);
+  
+  /* Typography */
+  --font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  
+  /* Spacing */
+  --space-xs: 0.25rem;
+  --space-sm: 0.5rem;
+  --space-md: 1rem;
+  --space-lg: 1.5rem;
+  --space-xl: 2rem;
+  --space-2xl: 3rem;
+  
+  /* Border Radius */
+  --radius-sm: 0.375rem;
+  --radius-md: 0.5rem;
+  --radius-lg: 0.75rem;
+  --radius-xl: 1rem;
+}
+
+/* ============================================================================
+   GLOBAL BODY STYLING
+   ============================================================================ */
+
+body {
+  font-family: var(--font-family) !important;
+  background: var(--medical-gradient) !important;
+  background-attachment: fixed !important;
+  min-height: 100vh !important;
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+body::before {
+  content: '';
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: 
+    radial-gradient(circle at 20% 50%, rgba(120, 119, 198, 0.3) 0%, transparent 50%),
+    radial-gradient(circle at 80% 20%, rgba(255, 119, 198, 0.3) 0%, transparent 50%),
+    radial-gradient(circle at 40% 80%, rgba(120, 219, 255, 0.3) 0%, transparent 50%);
+  z-index: -1;
+}
+
+/* ============================================================================
+   MAIN ADMIN CONTAINER
+   ============================================================================ */
+
+#container {
+  background: transparent !important;
+  backdrop-filter: var(--glass-backdrop) !important;
+  border-radius: var(--radius-xl) !important;
+  border: 1px solid var(--glass-border) !important;
+  box-shadow: var(--glass-shadow) !important;
+  margin: var(--space-lg) !important;
+  overflow: hidden !important;
+}
+
+/* ============================================================================
+   HEADER AND BRANDING
+   ============================================================================ */
+
+#header {
+  background: var(--glass-bg) !important;
+  backdrop-filter: var(--glass-backdrop) !important;
+  border-bottom: 1px solid var(--glass-border) !important;
+  padding: var(--space-md) var(--space-xl) !important;
+}
+
+.glass-branding a {
+  display: flex !important;
+  align-items: center !important;
+  gap: var(--space-md) !important;
+  text-decoration: none !important;
+  color: white !important;
+}
+
+.glass-branding .logo-icon {
+  font-size: 2rem !important;
+  filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3)) !important;
+}
+
+.glass-branding .branding-text h1 {
+  margin: 0 !important;
+  font-size: 1.5rem !important;
+  font-weight: 700 !important;
+  color: white !important;
+  text-shadow: 0 2px 4px rgba(0,0,0,0.3) !important;
+}
+
+.glass-branding .branding-text p {
+  margin: 0 !important;
+  font-size: 0.875rem !important;
+  color: rgba(255, 255, 255, 0.8) !important;
+  font-weight: 500 !important;
+}
+
+#site-name a {
+  color: white !important;
+  text-decoration: none !important;
+  font-weight: 600 !important;
+  font-size: 1.25rem !important;
+  display: flex !important;
+  align-items: center !important;
+  gap: var(--space-sm) !important;
+}
+
+.logo-icon {
+  font-size: 1.5rem !important;
+  filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3)) !important;
+}
+
+/* ============================================================================
+   NAVIGATION
+   ============================================================================ */
+
+.admin-nav-glass {
+  display: flex !important;
+  justify-content: space-between !important;
+  align-items: center !important;
+  padding: var(--space-sm) 0 !important;
+}
+
+.user-info-glass {
+  display: flex !important;
+  align-items: center !important;
+  gap: var(--space-md) !important;
+}
+
+.welcome-text {
+  color: rgba(255, 255, 255, 0.9) !important;
+  font-weight: 500 !important;
+  font-size: 0.875rem !important;
+}
+
+.glass-btn {
+  background: var(--glass-bg) !important;
+  backdrop-filter: var(--glass-backdrop) !important;
+  border: 1px solid var(--glass-border) !important;
+  border-radius: var(--radius-md) !important;
+  padding: var(--space-xs) var(--space-md) !important;
+  color: white !important;
+  text-decoration: none !important;
+  font-size: 0.875rem !important;
+  font-weight: 500 !important;
+  transition: all 0.3s ease !important;
+}
+
+.glass-btn:hover {
+  background: rgba(255, 255, 255, 0.3) !important;
+  transform: translateY(-1px) !important;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15) !important;
+  color: white !important;
+}
+
+.glass-btn.logout {
+  background: rgba(239, 68, 68, 0.2) !important;
+  border-color: rgba(239, 68, 68, 0.3) !important;
+}
+
+.glass-btn.logout:hover {
+  background: rgba(239, 68, 68, 0.3) !important;
+}
+
+/* ============================================================================
+   DASHBOARD GLASS LAYOUT
+   ============================================================================ */
+
+.glass-dashboard {
+  padding: var(--space-xl) !important;
+  background: transparent !important;
+}
+
+/* Force the dashboard content to use glass styling */
+#content {
+  min-height: auto !important;
+}
+
+#content > div {
+  background: transparent !important;
+}
+
+.dashboard-header {
+  text-align: center !important;
+  margin-bottom: var(--space-2xl) !important;
+  background: var(--glass-bg) !important;
+  backdrop-filter: var(--glass-backdrop) !important;
+  border: 1px solid var(--glass-border) !important;
+  border-radius: var(--radius-xl) !important;
+  padding: var(--space-xl) !important;
+  box-shadow: var(--glass-shadow) !important;
+}
+
+.dashboard-title {
+  margin: 0 0 var(--space-md) 0 !important;
+  font-size: 2.25rem !important;
+  font-weight: 700 !important;
+  color: white !important;
+  text-shadow: 0 2px 4px rgba(0,0,0,0.3) !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: var(--space-md) !important;
+}
+
+.title-icon {
+  font-size: 2.5rem !important;
+  filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3)) !important;
+}
+
+.dashboard-subtitle {
+  margin: 0 !important;
+  font-size: 1.125rem !important;
+  color: rgba(255, 255, 255, 0.8) !important;
+  font-weight: 400 !important;
+  max-width: 600px !important;
+  margin: 0 auto !important;
+}
+
+/* ============================================================================
+   GLASS CARDS GRID
+   ============================================================================ */
+
+.glass-cards-grid {
+  display: grid !important;
+  grid-template-columns: repeat(auto-fit, minmax(350px, 1fr)) !important;
+  gap: var(--space-xl) !important;
+  margin-bottom: var(--space-2xl) !important;
+}
+
+.glass-card {
+  background: var(--glass-bg) !important;
+  backdrop-filter: var(--glass-backdrop) !important;
+  border: 1px solid var(--glass-border) !important;
+  border-radius: var(--radius-xl) !important;
+  box-shadow: var(--glass-shadow) !important;
+  overflow: hidden !important;
+  transition: all 0.3s ease !important;
+}
+
+.glass-card:hover {
+  transform: translateY(-4px) !important;
+  box-shadow: 0 12px 40px 0 rgba(31, 38, 135, 0.5) !important;
+}
+
+.glass-card .card-header {
+  background: var(--medical-gradient-light) !important;
+  padding: var(--space-lg) !important;
+  border-bottom: 1px solid var(--glass-border) !important;
+}
+
+.glass-card .card-header h2 {
+  margin: 0 !important;
+  font-size: 1.25rem !important;
+  font-weight: 600 !important;
+  color: white !important;
+  display: flex !important;
+  align-items: center !important;
+  gap: var(--space-sm) !important;
+  text-shadow: 0 1px 2px rgba(0,0,0,0.3) !important;
+}
+
+.app-icon {
+  font-size: 1.5rem !important;
+  filter: drop-shadow(0 1px 2px rgba(0,0,0,0.3)) !important;
+}
+
+.glass-card .card-body {
+  padding: var(--space-lg) !important;
+}
+
+/* ============================================================================
+   MODEL ITEMS
+   ============================================================================ */
+
+.model-item {
+  margin-bottom: var(--space-md) !important;
+}
+
+.model-link {
+  display: flex !important;
+  align-items: center !important;
+  gap: var(--space-sm) !important;
+  padding: var(--space-md) !important;
+  background: rgba(255, 255, 255, 0.1) !important;
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+  border-radius: var(--radius-md) !important;
+  text-decoration: none !important;
+  color: white !important;
+  font-weight: 500 !important;
+  transition: all 0.3s ease !important;
+}
+
+.model-link:hover {
+  background: rgba(255, 255, 255, 0.2) !important;
+  border-color: rgba(255, 255, 255, 0.3) !important;
+  transform: translateX(4px) !important;
+  color: white !important;
+  text-decoration: none !important;
+}
+
+.model-icon {
+  font-size: 1.25rem !important;
+  filter: drop-shadow(0 1px 2px rgba(0,0,0,0.2)) !important;
+}
+
+.model-info {
+  flex: 1 !important;
+  display: flex !important;
+  justify-content: space-between !important;
+  align-items: center !important;
+}
+
+.model-name {
+  font-weight: 500 !important;
+  color: white !important;
+}
+
+.model-actions .add-link {
+  background: var(--medical-success) !important;
+  color: white !important;
+  padding: var(--space-xs) var(--space-sm) !important;
+  border-radius: var(--radius-sm) !important;
+  font-size: 0.75rem !important;
+  font-weight: 600 !important;
+  text-decoration: none !important;
+  transition: all 0.3s ease !important;
+}
+
+.model-actions .add-link:hover {
+  background: #059669 !important;
+  transform: scale(1.05) !important;
+  color: white !important;
+}
+
+/* ============================================================================
+   QUICK ACTIONS
+   ============================================================================ */
+
+.quick-actions {
+  grid-column: 1 / -1 !important;
+}
+
+.quick-actions-grid {
+  display: grid !important;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)) !important;
+  gap: var(--space-md) !important;
+}
+
+.quick-action-btn {
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  gap: var(--space-sm) !important;
+  padding: var(--space-lg) !important;
+  background: rgba(255, 255, 255, 0.1) !important;
+  border: 1px solid rgba(255, 255, 255, 0.2) !important;
+  border-radius: var(--radius-lg) !important;
+  text-decoration: none !important;
+  color: white !important;
+  font-weight: 500 !important;
+  transition: all 0.3s ease !important;
+  text-align: center !important;
+}
+
+.quick-action-btn:hover {
+  background: rgba(255, 255, 255, 0.2) !important;
+  border-color: rgba(255, 255, 255, 0.4) !important;
+  transform: translateY(-2px) !important;
+  color: white !important;
+  text-decoration: none !important;
+}
+
+.action-icon {
+  font-size: 2rem !important;
+  filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3)) !important;
+}
+
+/* ============================================================================
+   CONTENT AREA
+   ============================================================================ */
+
+#content {
+  background: transparent !important;
+  padding: var(--space-xl) !important;
+}
+
+/* ============================================================================
+   DEFAULT ADMIN DASHBOARD STYLING
+   ============================================================================ */
+
+/* Style the default Django admin dashboard */
+#content-main {
+  background: transparent !important;
+}
+
+/* Dashboard modules (the app cards) */
+.module, .dashboard-module {
+  background: var(--glass-bg) !important;
+  backdrop-filter: var(--glass-backdrop) !important;
+  border: 1px solid var(--glass-border) !important;
+  border-radius: var(--radius-xl) !important;
+  box-shadow: var(--glass-shadow) !important;
+  margin-bottom: var(--space-xl) !important;
+  overflow: hidden !important;
+  transition: all 0.3s ease !important;
+}
+
+/* Target the actual app list structure */
+#main .app-list {
+  background: transparent !important;
+}
+
+#main .module {
+  background: var(--glass-bg) !important;
+  backdrop-filter: var(--glass-backdrop) !important;
+  border: 1px solid var(--glass-border) !important;
+  border-radius: var(--radius-xl) !important;
+  box-shadow: var(--glass-shadow) !important;
+  margin-bottom: var(--space-xl) !important;
+  overflow: hidden !important;
+  transition: all 0.3s ease !important;
+}
+
+/* Main content area background */
+#main {
+  background: transparent !important;
+}
+
+.dashboard {
+  background: transparent !important;
+}
+
+.dashboard .module {
+  background: var(--glass-bg) !important;
+}
+
+.module:hover {
+  transform: translateY(-4px) !important;
+  box-shadow: 0 12px 40px 0 rgba(31, 38, 135, 0.5) !important;
+}
+
+.module th {
+  background: var(--medical-gradient-light) !important;
+  color: white !important;
+  padding: var(--space-lg) !important;
+  font-size: 1.25rem !important;
+  font-weight: 600 !important;
+  text-shadow: 0 1px 2px rgba(0,0,0,0.3) !important;
+  border: none !important;
+}
+
+.module td {
+  background: transparent !important;
+  padding: var(--space-md) var(--space-lg) !important;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1) !important;
+}
+
+.module td:last-child {
+  border-bottom: none !important;
+}
+
+.module a {
+  color: white !important;
+  text-decoration: none !important;
+  font-weight: 500 !important;
+  display: flex !important;
+  align-items: center !important;
+  gap: var(--space-sm) !important;
+  padding: var(--space-sm) 0 !important;
+  transition: all 0.3s ease !important;
+}
+
+.module a:hover {
+  color: var(--medical-primary) !important;
+  transform: translateX(4px) !important;
+}
+
+/* Add icons to the default admin links */
+.module a:before {
+  font-size: 1.25rem !important;
+  filter: drop-shadow(0 1px 2px rgba(0,0,0,0.2)) !important;
+}
+
+/* Specific icons for different sections */
+.module a[href*="auth/"]:before { content: "👤 "; }
+.module a[href*="user/"]:before { content: "👤 "; }
+.module a[href*="group/"]:before { content: "👥 "; }
+.module a[href*="userprofile/"]:before { content: "👨‍⚕️ "; }
+.module a[href*="patient/"]:before { content: "🩺 "; }
+.module a[href*="patienthistory/"]:before { content: "📖 "; }
+.module a[href*="measurement/"]:before { content: "📏 "; }
+.module a[href*="measurementvalue/"]:before { content: "🔢 "; }
+.module a[href*="schema/"]:before { content: "📋 "; }
+.module a[href*="indicator/"]:before { content: "🎯 "; }
+.module a[href*="scoringrange/"]:before { content: "📊 "; }
+.module a[href*="recommendationtemplate/"]:before { content: "💡 "; }
+
+/* Style the "Add" link */
+.addlink {
+  background: var(--medical-success) !important;
+  color: white !important;
+  padding: var(--space-xs) var(--space-sm) !important;
+  border-radius: var(--radius-sm) !important;
+  font-size: 0.75rem !important;
+  font-weight: 600 !important;
+  text-decoration: none !important;
+  transition: all 0.3s ease !important;
+  margin-left: auto !important;
+}
+
+.addlink:hover {
+  background: #059669 !important;
+  transform: scale(1.05) !important;
+  color: white !important;
+}
+
+.addlink:before {
+  content: "+ " !important;
+}
+
+/* Dashboard welcome message styling */
+#content h1 {
+  background: var(--glass-bg) !important;
+  backdrop-filter: var(--glass-backdrop) !important;
+  border: 1px solid var(--glass-border) !important;
+  border-radius: var(--radius-xl) !important;
+  padding: var(--space-xl) !important;
+  box-shadow: var(--glass-shadow) !important;
+  text-align: center !important;
+  margin-bottom: var(--space-2xl) !important;
+  font-size: 2.25rem !important;
+  font-weight: 700 !important;
+  color: white !important;
+  text-shadow: 0 2px 4px rgba(0,0,0,0.3) !important;
+}
+
+#content h1:before {
+  content: "🏥 " !important;
+  font-size: 2.5rem !important;
+  filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3)) !important;
+  margin-right: var(--space-md) !important;
+}
+
+/* Module table styling only */
+.module table {
+  background: transparent !important;
+  border: none !important;
+}
+
+.module th {
+  background: var(--medical-gradient-light) !important;
+  color: white !important;
+  padding: var(--space-lg) !important;
+  font-size: 1.25rem !important;
+  font-weight: 600 !important;
+  text-shadow: 0 1px 2px rgba(0,0,0,0.3) !important;
+  border: none !important;
+}
+
+.module td {
+  background: transparent !important;
+  padding: var(--space-md) var(--space-lg) !important;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1) !important;
+  color: white !important;
+}
+
+/* Module links styling */
+.module a {
+  color: white !important;
+  text-decoration: none !important;
+  font-weight: 500 !important;
+  transition: all 0.3s ease !important;
+}
+
+.module a:hover {
+  color: var(--medical-primary) !important;
+}
+
+/* Apply glass styling only to module elements */
+.module {
+  background: var(--glass-bg) !important;
+  backdrop-filter: var(--glass-backdrop) !important;
+  border: 1px solid var(--glass-border) !important;
+  border-radius: var(--radius-lg) !important;
+  box-shadow: var(--glass-shadow) !important;
+  margin-bottom: var(--space-lg) !important;
+  overflow: hidden !important;
+  transition: all 0.3s ease !important;
+}
+
+/* Clean glass styling for specific admin elements only */
+
+.module h2, .module caption, .inline-group h2 {
+  background: var(--glass-bg) !important;
+  backdrop-filter: var(--glass-backdrop) !important;
+  border: 1px solid var(--glass-border) !important;
+  border-radius: var(--radius-md) var(--radius-md) 0 0 !important;
+  color: white !important;
+  padding: var(--space-md) var(--space-lg) !important;
+  font-weight: 600 !important;
+  text-shadow: 0 1px 2px rgba(0,0,0,0.3) !important;
+}
+
+.results {
+  background: var(--glass-bg) !important;
+  backdrop-filter: var(--glass-backdrop) !important;
+  border: 1px solid var(--glass-border) !important;
+  border-radius: 0 0 var(--radius-md) var(--radius-md) !important;
+  box-shadow: var(--glass-shadow) !important;
+}
+
+/* ============================================================================
+   TABLES
+   ============================================================================ */
+
+.results table {
+  background: transparent !important;
+  border: none !important;
+}
+
+.results table thead th {
+  background: rgba(255, 255, 255, 0.1) !important;
+  color: white !important;
+  border-bottom: 1px solid var(--glass-border) !important;
+  padding: var(--space-md) !important;
+  font-weight: 600 !important;
+}
+
+.results table tbody tr {
+  background: transparent !important;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1) !important;
+}
+
+.results table tbody tr:hover {
+  background: rgba(255, 255, 255, 0.1) !important;
+}
+
+.results table tbody td {
+  color: rgba(255, 255, 255, 0.9) !important;
+  padding: var(--space-md) !important;
+  border: none !important;
+}
+
+.results table tbody td a {
+  color: white !important;
+  font-weight: 500 !important;
+}
+
+.results table tbody td a:hover {
+  color: var(--medical-primary) !important;
+  text-decoration: none !important;
+}
+
+/* ============================================================================
+   FORMS
+   ============================================================================ */
+
+.form-row {
+  background: var(--glass-bg) !important;
+  backdrop-filter: var(--glass-backdrop) !important;
+  border: 1px solid var(--glass-border) !important;
+  border-radius: var(--radius-md) !important;
+  padding: var(--space-lg) !important;
+  margin-bottom: var(--space-md) !important;
+  box-shadow: var(--glass-shadow) !important;
+}
+
+.form-row label {
+  color: white !important;
+  font-weight: 500 !important;
+}
+
+.form-row input, .form-row select, .form-row textarea {
+  background: rgba(255, 255, 255, 0.1) !important;
+  border: 1px solid var(--glass-border) !important;
+  border-radius: var(--radius-sm) !important;
+  color: white !important;
+  padding: var(--space-sm) var(--space-md) !important;
+}
+
+.form-row input:focus, .form-row select:focus, .form-row textarea:focus {
+  background: rgba(255, 255, 255, 0.2) !important;
+  border-color: var(--medical-primary) !important;
+  outline: none !important;
+  box-shadow: 0 0 0 2px rgba(79, 140, 246, 0.3) !important;
+}
+
+/* ============================================================================
+   BUTTONS
+   ============================================================================ */
+
+.default, input[type="submit"], .submit-row input {
+  background: var(--medical-primary) !important;
+  border: 1px solid var(--medical-primary-dark) !important;
+  border-radius: var(--radius-md) !important;
+  color: white !important;
+  padding: var(--space-sm) var(--space-lg) !important;
+  font-weight: 600 !important;
+  transition: all 0.3s ease !important;
+  cursor: pointer !important;
+}
+
+.default:hover, input[type="submit"]:hover, .submit-row input:hover {
+  background: var(--medical-primary-dark) !important;
+  transform: translateY(-1px) !important;
+  box-shadow: 0 4px 12px rgba(79, 140, 246, 0.4) !important;
+}
+
+.deletelink {
+  background: var(--medical-danger) !important;
+  border: 1px solid #dc2626 !important;
+}
+
+.deletelink:hover {
+  background: #dc2626 !important;
+  box-shadow: 0 4px 12px rgba(239, 68, 68, 0.4) !important;
+}
+
+/* ============================================================================
+   BREADCRUMBS
+   ============================================================================ */
+
+.breadcrumbs {
+  background: var(--glass-bg) !important;
+  backdrop-filter: var(--glass-backdrop) !important;
+  border: 1px solid var(--glass-border) !important;
+  border-radius: var(--radius-md) !important;
+  padding: var(--space-md) var(--space-lg) !important;
+  margin-bottom: var(--space-lg) !important;
+  box-shadow: var(--glass-shadow) !important;
+}
+
+.breadcrumbs a {
+  color: white !important;
+  text-decoration: none !important;
+  font-weight: 500 !important;
+}
+
+.breadcrumbs a:hover {
+  color: var(--medical-primary) !important;
+}
+
+/* ============================================================================
+   MESSAGES
+   ============================================================================ */
+
+.messagelist {
+  background: var(--glass-bg) !important;
+  backdrop-filter: var(--glass-backdrop) !important;
+  border: 1px solid var(--glass-border) !important;
+  border-radius: var(--radius-md) !important;
+  box-shadow: var(--glass-shadow) !important;
+  margin-bottom: var(--space-lg) !important;
+}
+
+.messagelist li {
+  color: white !important;
+  padding: var(--space-md) var(--space-lg) !important;
+  font-weight: 500 !important;
+}
+
+.messagelist .success {
+  background: rgba(16, 185, 129, 0.2) !important;
+  border-left: 4px solid var(--medical-success) !important;
+}
+
+.messagelist .error {
+  background: rgba(239, 68, 68, 0.2) !important;
+  border-left: 4px solid var(--medical-danger) !important;
+}
+
+.messagelist .warning {
+  background: rgba(245, 158, 11, 0.2) !important;
+  border-left: 4px solid var(--medical-warning) !important;
+}
+
+/* ============================================================================
+   RESPONSIVE DESIGN
+   ============================================================================ */
+
+@media (max-width: 768px) {
+  .glass-cards-grid {
+    grid-template-columns: 1fr !important;
+    gap: var(--space-md) !important;
+  }
+  
+  .quick-actions-grid {
+    grid-template-columns: repeat(2, 1fr) !important;
+  }
+  
+  .dashboard-title {
+    font-size: 1.75rem !important;
+    flex-direction: column !important;
+  }
+  
+  .glass-dashboard {
+    padding: var(--space-md) !important;
+  }
+  
+  #container {
+    margin: var(--space-sm) !important;
+  }
+}

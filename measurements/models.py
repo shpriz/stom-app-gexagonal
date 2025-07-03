@@ -5,16 +5,18 @@ from indicators.models import Indicator
 
 
 class Measurement(models.Model):
-    patient = models.ForeignKey(Patient, on_delete=models.CASCADE, related_name='measurements')
-    measurement_date = models.DateTimeField()
-    notes = models.TextField(blank=True)
-    show_in_chart = models.BooleanField(default=True, help_text="Show this measurement in radar chart")
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
+    patient = models.ForeignKey(Patient, on_delete=models.CASCADE, related_name='measurements', verbose_name="Пациент")
+    measurement_date = models.DateTimeField(verbose_name="Дата измерения")
+    notes = models.TextField(blank=True, verbose_name="Заметки")
+    show_in_chart = models.BooleanField(default=True, help_text="Показывать это измерение на радарной диаграмме", verbose_name="Показывать на диаграмме")
+    created_at = models.DateTimeField(auto_now_add=True, verbose_name="Создано")
+    updated_at = models.DateTimeField(auto_now=True, verbose_name="Обновлено")
     
     class Meta:
         ordering = ['-measurement_date']
         unique_together = ['patient', 'measurement_date']
+        verbose_name = "Измерение"
+        verbose_name_plural = "Измерения"
     
     def __str__(self):
         return f"{self.patient.full_name} - {self.measurement_date.strftime('%Y-%m-%d %H:%M')}"
@@ -42,12 +44,14 @@ class Measurement(models.Model):
 
 
 class MeasurementValue(models.Model):
-    measurement = models.ForeignKey(Measurement, on_delete=models.CASCADE, related_name='values')
-    indicator = models.ForeignKey(Indicator, on_delete=models.CASCADE)
-    value = models.IntegerField(validators=[MinValueValidator(0), MaxValueValidator(2)], help_text="Score value (0-2 points)")
+    measurement = models.ForeignKey(Measurement, on_delete=models.CASCADE, related_name='values', verbose_name="Измерение")
+    indicator = models.ForeignKey(Indicator, on_delete=models.CASCADE, verbose_name="Индикатор")
+    value = models.IntegerField(validators=[MinValueValidator(0), MaxValueValidator(2)], help_text="Значение балла (0-2 балла)", verbose_name="Значение")
     
     class Meta:
         unique_together = ['measurement', 'indicator']
+        verbose_name = "Значение измерения"
+        verbose_name_plural = "Значения измерений"
     
     def __str__(self):
         return f"{self.indicator.name}: {self.value} {self.indicator.unit}"

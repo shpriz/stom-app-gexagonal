@@ -1,54 +1,26 @@
-<!DOCTYPE html>
-<html lang="ru">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Редактировать пациента - Стоматологическая клиника</title>
-    <link rel="stylesheet" href="/static/css/modern-medical.css">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-</head>
-<body>
-    <!-- Header Navigation -->
-    <header class="header">
-        <div class="container">
-            <div class="header-content">
-                <a href="/" class="logo">
-                    <span class="logo-icon">🦷</span>
-                    <span>Стоматологическая клиника</span>
-                </a>
-                
-                <nav class="nav">
-                    <a href="/" class="nav-link">🏠 Панель управления</a>
-                    <a href="/patients/" class="nav-link active">👥 Все пациенты</a>
-                    <a href="/patient/add/" class="nav-link">➕ Новый пациент</a>
-                    <a href="/indicators/" class="nav-link">⚙️ Настройки</a>
-                    <a href="/schemas/" class="nav-link">📋 Схемы</a>
-                    <a href="/auth/logout/" class="btn btn-danger btn-sm">🚪 Выход</a>
-                </nav>
+{% extends 'base.html' %}
+
+{% block title %}Редактировать пациента - Стоматологическая клиника{% endblock %}
+
+{% block nav_patients %}active{% endblock %}
+
+{% block page_header %}
+    <!-- Page Header -->
+    <div class="patients-header-combined">
+        <div class="header-top">
+            <div class="patients-count">
+                ✏️ Редактировать пациента
+            </div>
+            <div class="patients-count" style="font-size: var(--font-size-base);">
+                👤 {{ patient.full_name }}
             </div>
         </div>
-    </header>
+    </div>
+{% endblock %}
 
-    <div class="container">
-        <!-- Messages Section -->
-        {% include 'components/messages.html' %}
-
-        <!-- Page Header -->
-        <div class="patients-header-combined">
-            <div class="header-top">
-                <div class="patients-count">
-                    ✏️ Редактировать пациента
-                </div>
-                <div class="patients-count" style="font-size: var(--font-size-base);">
-                    👤 {{ patient.full_name }}
-                </div>
-            </div>
-        </div>
-
-        <div class="card">
-            <div class="card-body">
+{% block content %}
+    <div class="card">
+        <div class="card-body">
                 {% if form.errors %}
                     <div class="alert alert-danger">
                         <strong>❌ Пожалуйста, исправьте следующие ошибки:</strong>
@@ -134,8 +106,6 @@
                     </a>
                 </div>
             </form>
-            </div>
         </div>
     </div>
-</body>
-</html>
+{% endblock %}

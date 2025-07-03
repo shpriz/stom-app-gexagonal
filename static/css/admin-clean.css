@@ -1,0 +1,70 @@
+/*
+Clean Admin CSS - Simple Russian Medical Theme
+Only adds basic styling without breaking Django admin
+*/
+
+/* Russian fonts */
+body {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important;
+}
+
+/* Simple header branding */
+#header #branding h1 {
+    font-weight: 600 !important;
+}
+
+#header #branding h1:before {
+    content: "🦷 " !important;
+    font-size: 1.2em !important;
+}
+
+/* Clean module styling - minimal changes */
+.module {
+    border-radius: 8px !important;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1) !important;
+    margin-bottom: 20px !important;
+}
+
+.module h2 {
+    border-radius: 8px 8px 0 0 !important;
+    font-weight: 600 !important;
+}
+
+/* Add simple icons to admin sections */
+.module a[href*="user/"]:before { content: "👤 "; }
+.module a[href*="group/"]:before { content: "👥 "; }
+.module a[href*="userprofile/"]:before { content: "👨‍⚕️ "; }
+.module a[href*="patient/"]:before { content: "🩺 "; }
+.module a[href*="measurement/"]:before { content: "📏 "; }
+.module a[href*="schema/"]:before { content: "📋 "; }
+.module a[href*="indicator/"]:before { content: "🎯 "; }
+.module a[href*="scoringrange/"]:before { content: "📊 "; }
+.module a[href*="recommendationtemplate/"]:before { content: "💡 "; }
+
+/* Clean button styling */
+.button, input[type="submit"], .submit-row input {
+    border-radius: 6px !important;
+    font-weight: 500 !important;
+    transition: all 0.2s ease !important;
+}
+
+.button:hover, input[type="submit"]:hover, .submit-row input:hover {
+    transform: translateY(-1px) !important;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.15) !important;
+}
+
+/* Simple form improvements */
+.form-row {
+    border-radius: 6px !important;
+}
+
+.form-row input, .form-row select, .form-row textarea {
+    border-radius: 4px !important;
+    border: 1px solid #ddd !important;
+    transition: border-color 0.2s ease !important;
+}
+
+.form-row input:focus, .form-row select:focus, .form-row textarea:focus {
+    border-color: #4F8CF6 !important;
+    box-shadow: 0 0 0 2px rgba(79, 140, 246, 0.1) !important;
+}

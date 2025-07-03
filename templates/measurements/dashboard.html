@@ -1,47 +1,10 @@
-<!DOCTYPE html>
-<html lang="ru">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Панель управления - Стоматологическая клиника</title>
-    <link rel="stylesheet" href="/static/css/modern-medical.css">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-</head>
-<body>
-    <!-- Header Navigation -->
-    <header class="header">
-        <div class="container">
-            <div class="header-content">
-                <a href="/" class="logo">
-                    <span class="logo-icon">🦷</span>
-                    <span>Стоматологическая клиника</span>
-                </a>
-                
-                <nav class="nav">
-                    <a href="/" class="nav-link active">
-                        🏠 Панель управления
-                    </a>
-                    {% if user.profile.can_view_all_patients %}
-                        <a href="/patients/" class="nav-link">
-                            👥 Пациенты
-                        </a>
-                    {% endif %}
-                    <a href="/indicators/" class="nav-link">
-                        ⚙️ Настройки
-                    </a>
-                    <a href="/auth/logout/" class="btn btn-danger btn-sm">
-                        🚪 Выход
-                    </a>
-                </nav>
-            </div>
-        </div>
-    </header>
+{% extends 'base.html' %}
 
-    <div class="container">
-        <!-- Messages Section -->
-        {% include 'components/messages.html' %}
+{% block title %}Панель управления - Стоматологическая клиника{% endblock %}
+
+{% block nav_dashboard %}active{% endblock %}
+
+{% block content %}
 
         <!-- Hero Welcome Section -->
         <div class="hero-section mb-8">
@@ -178,8 +141,10 @@
                 </div>
             </div>
         </div>
-    </div>
 
+{% endblock %}
+
+{% block extra_js %}
     <script>
         // Add animation delays to stats cards
         document.addEventListener('DOMContentLoaded', function() {
@@ -189,5 +154,4 @@
             });
         });
     </script>
-</body>
-</html>
+{% endblock %}

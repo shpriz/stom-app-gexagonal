@@ -4,30 +4,30 @@ from django.core.exceptions import ValidationError
 
 
 class UserProfile(models.Model):
-    """Extended user profile for medical practice staff"""
+    """Расширенный профиль пользователя для медицинского персонала"""
     
     ROLE_CHOICES = [
-        ('doctor', 'Doctor'),
-        ('nurse', 'Nurse'),
-        ('admin', 'Administrator'),
-        ('researcher', 'Researcher'),
+        ('doctor', 'Врач'),
+        ('nurse', 'Медсестра'),
+        ('admin', 'Администратор'),
+        ('researcher', 'Исследователь'),
     ]
     
-    user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='profile')
-    role = models.CharField(max_length=20, choices=ROLE_CHOICES, default='nurse')
+    user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='profile', verbose_name="Пользователь")
+    role = models.CharField(max_length=20, choices=ROLE_CHOICES, default='nurse', verbose_name="Роль")
     license_number = models.CharField(max_length=50, blank=True, null=True, 
-                                    help_text="Medical license number for doctors")
+                                    help_text="Номер медицинской лицензии для врачей", verbose_name="Номер лицензии")
     department = models.CharField(max_length=100, blank=True, null=True,
-                                help_text="Department or specialty")
-    phone = models.CharField(max_length=20, blank=True, null=True)
+                                help_text="Отделение или специальность", verbose_name="Отделение")
+    phone = models.CharField(max_length=20, blank=True, null=True, verbose_name="Телефон")
     is_active_staff = models.BooleanField(default=True,
-                                        help_text="Whether this staff member is currently active")
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
+                                        help_text="Является ли этот сотрудник активным в настоящее время", verbose_name="Активный сотрудник")
+    created_at = models.DateTimeField(auto_now_add=True, verbose_name="Создан")
+    updated_at = models.DateTimeField(auto_now=True, verbose_name="Обновлен")
     
     class Meta:
-        verbose_name = "User Profile"
-        verbose_name_plural = "User Profiles"
+        verbose_name = "Профиль пользователя"
+        verbose_name_plural = "Профили пользователей"
         
     def __str__(self):
         return f"{self.user.get_full_name() or self.user.username} ({self.get_role_display()})"
@@ -68,19 +68,19 @@ class UserProfile(models.Model):
 
 
 class UserSession(models.Model):
-    """Track user sessions for audit purposes"""
+    """Отслеживание пользовательских сессий для аудита"""
     
-    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='sessions_log')
-    session_key = models.CharField(max_length=40)
-    login_time = models.DateTimeField(auto_now_add=True)
-    logout_time = models.DateTimeField(null=True, blank=True)
-    ip_address = models.GenericIPAddressField(null=True, blank=True)
-    user_agent = models.TextField(blank=True, null=True)
-    is_active = models.BooleanField(default=True)
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='sessions_log', verbose_name="Пользователь")
+    session_key = models.CharField(max_length=40, verbose_name="Ключ сессии")
+    login_time = models.DateTimeField(auto_now_add=True, verbose_name="Время входа")
+    logout_time = models.DateTimeField(null=True, blank=True, verbose_name="Время выхода")
+    ip_address = models.GenericIPAddressField(null=True, blank=True, verbose_name="IP адрес")
+    user_agent = models.TextField(blank=True, null=True, verbose_name="User Agent")
+    is_active = models.BooleanField(default=True, verbose_name="Активна")
     
     class Meta:
-        verbose_name = "User Session"
-        verbose_name_plural = "User Sessions"
+        verbose_name = "Сессия пользователя"
+        verbose_name_plural = "Сессии пользователей"
         ordering = ['-login_time']
         
     def __str__(self):

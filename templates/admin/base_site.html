@@ -1,0 +1,16 @@
+{% extends "admin/base.html" %}
+
+{% block title %}{{ title }} | Стоматологическая клиника{% endblock %}
+
+{% block branding %}
+<h1 id="site-name">
+    <a href="{% url 'admin:index' %}">
+        🦷 Стоматологическая клиника
+    </a>
+</h1>
+<div style="font-size: 12px; color: #666; margin-top: 5px;">
+    Административная панель
+</div>
+{% endblock %}
+
+{% block nav-global %}{% endblock %}

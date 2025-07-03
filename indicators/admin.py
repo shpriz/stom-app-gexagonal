@@ -111,6 +111,10 @@ class SchemaAdmin(admin.ModelAdmin):
     list_filter = ['is_active', 'created_at']
     search_fields = ['name', 'description']
     readonly_fields = ['created_at', 'updated_at']
+    
+    class Meta:
+        verbose_name = "Схема"
+        verbose_name_plural = "Схемы"
 
 
 @admin.register(Indicator)
@@ -141,22 +145,39 @@ class IndicatorAdmin(admin.ModelAdmin):
 
 @admin.register(RecommendationTemplate)
 class RecommendationTemplateAdmin(admin.ModelAdmin):
-    list_display = ['schema', 'risk_level', 'min_score', 'max_score', 'title']
+    list_display = ['schema', 'get_risk_level_display', 'min_score', 'max_score', 'title']
     list_filter = ['schema', 'risk_level']
     search_fields = ['title', 'description']
     ordering = ['schema', 'min_score']
     
     fieldsets = (
-        ('Схема и уровень риска', {
-            'fields': ('schema', 'risk_level', 'min_score', 'max_score')
+        ('🏥 Схема и уровень риска', {
+            'fields': ('schema', 'risk_level', 'min_score', 'max_score'),
+            'description': 'Выберите схему обследования и определите диапазон баллов для уровня риска'
         }),
-        ('Содержание рекомендации', {
+        ('📝 Содержание рекомендации', {
             'fields': ('title', 'description', 'recommendations'),
-            'description': 'Основное содержание медицинских рекомендаций'
+            'description': '''
+            <strong>Заполните медицинские рекомендации:</strong><br/>
+            • <strong>Заголовок:</strong> Краткое описание уровня риска<br/>
+            • <strong>Описание:</strong> Диапазон баллов и объяснение<br/>
+            • <strong>Рекомендации:</strong> Подробные медицинские инструкции
+            '''
         }),
-        ('Специфические рекомендации по индикаторам', {
+        ('🎯 Специфические рекомендации по индикаторам', {
             'fields': ('indicator_recommendations',),
-            'description': 'JSON формат: {"Indicator Name": "Specific recommendation for this indicator"}',
+            'description': '''
+            <strong>JSON формат для индикаторов:</strong><br/>
+            <code>{<br/>
+            &nbsp;&nbsp;"Курение": "Рекомендации по курению...",<br/>
+            &nbsp;&nbsp;"OHIP 14": "Рекомендации по качеству жизни...",<br/>
+            &nbsp;&nbsp;"Длительность": "Рекомендации по времени..."<br/>
+            }</code>
+            ''',
             'classes': ('collapse',)
         })
     )
+    
+    def get_risk_level_display(self, obj):
+        return obj.get_risk_level_display()
+    get_risk_level_display.short_description = 'Уровень риска'

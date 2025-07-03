@@ -3,26 +3,28 @@ from django.core.validators import MinValueValidator, MaxValueValidator
 
 
 class Schema(models.Model):
-    name = models.CharField(max_length=100, unique=True)
-    description = models.TextField(blank=True)
-    order = models.PositiveIntegerField(default=1, help_text="Display order (1=first, 2=second, etc.)")
-    is_active = models.BooleanField(default=True)
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
+    name = models.CharField(max_length=100, unique=True, verbose_name="Название")
+    description = models.TextField(blank=True, verbose_name="Описание")
+    order = models.PositiveIntegerField(default=1, help_text="Порядок отображения (1=первая, 2=вторая, и т.д.)", verbose_name="Порядок")
+    is_active = models.BooleanField(default=True, verbose_name="Активна")
+    created_at = models.DateTimeField(auto_now_add=True, verbose_name="Создана")
+    updated_at = models.DateTimeField(auto_now=True, verbose_name="Обновлена")
     
     class Meta:
         ordering = ['order', 'name']
+        verbose_name = "Схема"
+        verbose_name_plural = "Схемы"
     
     def __str__(self):
-        return f"Schema {self.order}: {self.name}"
+        return f"Схема {self.order}: {self.name}"
 
 
 class Indicator(models.Model):
-    schema = models.ForeignKey(Schema, on_delete=models.CASCADE, related_name='indicators', null=True, blank=True)
-    name = models.CharField(max_length=100)
-    description = models.TextField(blank=True)
-    min_value = models.FloatField(validators=[MinValueValidator(0)])
-    max_value = models.FloatField(validators=[MinValueValidator(0)])
+    schema = models.ForeignKey(Schema, on_delete=models.CASCADE, related_name='indicators', null=True, blank=True, verbose_name="Схема")
+    name = models.CharField(max_length=100, verbose_name="Название")
+    description = models.TextField(blank=True, verbose_name="Описание")
+    min_value = models.FloatField(validators=[MinValueValidator(0)], verbose_name="Минимальное значение")
+    max_value = models.FloatField(validators=[MinValueValidator(0)], verbose_name="Максимальное значение")
     
     # Color zone thresholds (as percentages of max_value)
     green_threshold = models.FloatField(
@@ -59,13 +61,15 @@ class Indicator(models.Model):
         help_text="Score when value is 0 or empty (e.g., 0 points for 'Does not smoke')"
     )
     
-    is_active = models.BooleanField(default=True)
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
+    is_active = models.BooleanField(default=True, verbose_name="Активен")
+    created_at = models.DateTimeField(auto_now_add=True, verbose_name="Создан")
+    updated_at = models.DateTimeField(auto_now=True, verbose_name="Обновлен")
     
     class Meta:
         ordering = ['schema__order', 'name']
         unique_together = ['schema', 'name']
+        verbose_name = "Индикатор"
+        verbose_name_plural = "Индикаторы"
     
     def __str__(self):
         return f"{self.schema.name}: {self.name} ({self.min_value}-{self.max_value} {self.unit})"
@@ -108,27 +112,29 @@ class Indicator(models.Model):
 
 
 class ScoringRange(models.Model):
-    """Defines scoring ranges for indicators"""
-    indicator = models.ForeignKey(Indicator, on_delete=models.CASCADE, related_name='scoring_ranges')
-    score = models.IntegerField(validators=[MinValueValidator(0), MaxValueValidator(2)])
+    """Определяет диапазоны оценок для индикаторов"""
+    indicator = models.ForeignKey(Indicator, on_delete=models.CASCADE, related_name='scoring_ranges', verbose_name="Индикатор")
+    score = models.IntegerField(validators=[MinValueValidator(0), MaxValueValidator(2)], verbose_name="Балл")
     
     # Range definition
-    min_value = models.FloatField(null=True, blank=True, help_text="Minimum value (inclusive)")
-    max_value = models.FloatField(null=True, blank=True, help_text="Maximum value (inclusive)")
-    step = models.FloatField(default=1.0, help_text="Step between min and max values (default: 1)")
+    min_value = models.FloatField(null=True, blank=True, help_text="Минимальное значение (включительно)", verbose_name="Минимальное значение")
+    max_value = models.FloatField(null=True, blank=True, help_text="Максимальное значение (включительно)", verbose_name="Максимальное значение")
+    step = models.FloatField(default=1.0, help_text="Шаг между минимальным и максимальным значениями (по умолчанию: 1)", verbose_name="Шаг")
     
     # Special cases
-    is_greater_than_or_equal = models.BooleanField(default=False, help_text="≥ min_value (ignores max_value)")
-    is_less_than = models.BooleanField(default=False, help_text="< max_value (ignores min_value)")
-    exact_value = models.FloatField(null=True, blank=True, help_text="Exact value match (for specific values like 0, 1, 2)")
+    is_greater_than_or_equal = models.BooleanField(default=False, help_text="≥ минимального значения (игнорирует максимальное значение)", verbose_name="Больше или равно")
+    is_less_than = models.BooleanField(default=False, help_text="< максимального значения (игнорирует минимальное значение)", verbose_name="Меньше чем")
+    exact_value = models.FloatField(null=True, blank=True, help_text="Точное совпадение значения (для конкретных значений как 0, 1, 2)", verbose_name="Точное значение")
     
-    description = models.CharField(max_length=100, help_text="Description like '0-28', '≥20', 'Does not smoke'")
+    description = models.CharField(max_length=100, help_text="Описание как '0-28', '≥20', 'Не курит'", verbose_name="Описание")
     
-    created_at = models.DateTimeField(auto_now_add=True)
+    created_at = models.DateTimeField(auto_now_add=True, verbose_name="Создано")
     
     class Meta:
         ordering = ['indicator', 'score']
         unique_together = ['indicator', 'score']
+        verbose_name = "Диапазон оценок"
+        verbose_name_plural = "Диапазоны оценок"
     
     def __str__(self):
         return f"{self.indicator.name}: {self.description} = {self.score} points"
@@ -193,37 +199,40 @@ class ScoringRange(models.Model):
 
 
 class RecommendationTemplate(models.Model):
-    """Template for medical recommendations based on schema scores"""
-    schema = models.ForeignKey(Schema, on_delete=models.CASCADE, related_name='recommendation_templates')
+    """Шаблон медицинских рекомендаций на основе баллов схемы"""
+    schema = models.ForeignKey(Schema, on_delete=models.CASCADE, related_name='recommendation_templates', verbose_name="Схема")
     
     # Risk level definition
     risk_level = models.CharField(max_length=20, choices=[
         ('low', 'Низкий риск'),
         ('moderate', 'Умеренный риск'), 
         ('high', 'Высокий риск')
-    ])
+    ], verbose_name="Уровень риска")
     
     # Score range for this recommendation
-    min_score = models.IntegerField(help_text="Minimum total score for this risk level")
-    max_score = models.IntegerField(help_text="Maximum total score for this risk level")
+    min_score = models.IntegerField(help_text="Минимальный общий балл для этого уровня риска", verbose_name="Минимальный балл")
+    max_score = models.IntegerField(help_text="Максимальный общий балл для этого уровня риска", verbose_name="Максимальный балл")
     
     # Recommendation content
-    title = models.CharField(max_length=200, help_text="Title of the risk assessment")
-    description = models.TextField(help_text="Description of the risk level")
-    recommendations = models.TextField(help_text="Detailed medical recommendations")
+    title = models.CharField(max_length=200, help_text="Заголовок оценки риска", verbose_name="Заголовок")
+    description = models.TextField(help_text="Описание уровня риска", verbose_name="Описание")
+    recommendations = models.TextField(help_text="Подробные медицинские рекомендации", verbose_name="Рекомендации")
     
     # Indicator-specific recommendations
     indicator_recommendations = models.JSONField(
         default=dict,
-        help_text="Specific recommendations for each indicator (JSON format)"
+        help_text="Специфические рекомендации для каждого индикатора (JSON формат)",
+        verbose_name="Рекомендации по индикаторам"
     )
     
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
+    created_at = models.DateTimeField(auto_now_add=True, verbose_name="Создано")
+    updated_at = models.DateTimeField(auto_now=True, verbose_name="Обновлено")
     
     class Meta:
         ordering = ['schema', 'min_score']
         unique_together = ['schema', 'risk_level']
+        verbose_name = "Шаблон рекомендаций"
+        verbose_name_plural = "Шаблоны рекомендаций"
     
     def __str__(self):
         return f"{self.schema.name}: {self.get_risk_level_display()} ({self.min_score}-{self.max_score} баллов)"
