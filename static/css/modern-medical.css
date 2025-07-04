@@ -1614,7 +1614,8 @@ h1, h2, h3, h4, h5, h6 {
 
 .indicator-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  grid-template-columns: repeat(2, 1fr);
+  grid-template-rows: repeat(3, auto);
   gap: var(--space-4);
   margin-top: var(--space-4);
 }
@@ -1759,7 +1760,7 @@ body:has(#chartsContainer) .container {
 }
 
 .chart-section {
-  flex: 2;
+  flex: 1;
   padding: var(--space-6);
   min-height: 600px;
 }
@@ -1835,7 +1836,7 @@ body:has(#chartsContainer) .container {
 }
 
 .recommendations-section {
-  flex: 1.2;
+  flex: 1;
   padding: var(--space-6);
   background: var(--gray-50);
   border-left: 3px solid var(--primary-light);
