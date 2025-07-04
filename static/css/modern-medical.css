@@ -1621,7 +1621,7 @@ h1, h2, h3, h4, h5, h6 {
 
 .indicator-item {
   display: grid;
-  grid-template-columns: 60% 25% 15%;
+  grid-template-columns: 1fr auto auto;
   gap: var(--space-3);
   align-items: center;
   padding: var(--space-4);
@@ -1657,6 +1657,8 @@ h1, h2, h3, h4, h5, h6 {
 .indicator-input {
   display: flex;
   align-items: center;
+  width: 120px;
+  justify-content: center;
 }
 
 .indicator-input input {
@@ -1694,6 +1696,7 @@ h1, h2, h3, h4, h5, h6 {
   background: var(--primary-light);
   border-radius: var(--radius);
   min-height: 40px;
+  min-width: 80px;
   transition: var(--transition);
 }
 
