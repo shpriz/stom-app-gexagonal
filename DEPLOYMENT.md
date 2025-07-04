@@ -1,7 +1,24 @@
-# Deployment Guide: Django Stomatology Practice Management System
+# 🚀 Comprehensive Deployment Guide: Advanced Stomatology Practice Management System
 
-## Overview
-This guide provides step-by-step instructions for deploying the Django stomatology practice management system on a remote server using Docker.
+## 🎯 System Overview
+This guide provides step-by-step instructions for deploying the advanced Django stomatology practice management system featuring:
+
+**Core Features:**
+- **Multi-doctor patient segregation** with secure data isolation
+- **Interactive hexagonal radar charts** with population analytics
+- **Schema-based assessments** (OHIP, Clinical Status, Custom)
+- **Advanced scoring system** with flexible automatic calculation
+- **Professional PDF report generation** with high-quality charts
+- **Population statistics** with z-scores and outlier detection
+- **Authentication & authorization** with role-based access control
+
+**Technical Stack:**
+- Django 4.2+ with REST Framework
+- PostgreSQL 15 with optimized performance
+- Docker & Docker Compose for containerization
+- Nginx reverse proxy with security headers
+- WhiteNoise for efficient static file serving
+- Professional medical UI framework
 
 ## Prerequisites
 - Remote server with Ubuntu 20.04+ or CentOS 8+ (minimum 2GB RAM, 20GB storage)

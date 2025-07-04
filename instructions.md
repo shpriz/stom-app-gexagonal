@@ -1,11 +1,23 @@
-# 🏥 Stomatology Practice Management System - Production Deployment
+# 🏥 Stomatology Practice Management System - Complete Guide
 
-## 📋 Prerequisites
+## 📋 System Overview
+
+This is a comprehensive dental practice management system featuring:
+- **Multi-doctor patient segregation** - Each doctor sees only their patients
+- **Interactive hexagonal radar charts** - Visual risk assessment with population analytics  
+- **Schema-based assessments** - Configurable indicator groups (OHIP, Clinical Status)
+- **Advanced scoring system** - Flexible automatic calculation with custom ranges
+- **PDF report generation** - Professional medical reports with charts
+- **Authentication & authorization** - Role-based access (Doctor, Nurse, Administrator)
+- **Population statistics** - Group averages, z-scores, outlier detection
+
+## 🎯 Prerequisites
 
 - Docker and Docker Compose installed
 - Git installed
 - Domain name (optional, for HTTPS)
 - SSL certificates (optional, for HTTPS)
+- Basic understanding of medical assessment workflows
 
 ## 🚀 Quick Start (Local Production)
 
