@@ -231,7 +231,7 @@ class RecommendationTemplate(models.Model):
     
     class Meta:
         ordering = ['schema', 'min_score']
-        unique_together = ['schema', 'risk_level']
+        unique_together = ['schema', 'risk_level', 'min_score', 'max_score']
         verbose_name = "Шаблон рекомендаций"
         verbose_name_plural = "Шаблоны рекомендаций"
     
