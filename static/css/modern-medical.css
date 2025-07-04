@@ -1732,39 +1732,28 @@ h1, h2, h3, h4, h5, h6 {
    RADAR CHART PAGE STYLES
    ============================================================================ */
 
-/* Full-width container for chart pages */
-body:has(#chartsContainer) .container {
-  max-width: 95%;
-  width: 95%;
-  margin: 0 auto;
-}
 
-/* Alternative selector for better browser support */
-.chart-page-container {
-  max-width: 95% !important;
-  width: 95% !important;
-  margin: 0 auto !important;
-}
 
 .schema-row {
   display: flex;
-  margin-bottom: var(--space-10);
-  gap: var(--space-5);
+  margin-bottom: var(--space-8);
   background: var(--white);
-  border-radius: var(--radius-xl);
-  box-shadow: var(--shadow-lg);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-md);
   overflow: hidden;
-  border: 1px solid var(--gray-200);
-  width: 100%;
-  max-width: none;
 }
 
 .chart-section {
   flex: 1;
   padding: var(--space-6);
-  min-height: 600px;
 }
 
+.recommendations-section {
+  flex: 1;
+  padding: var(--space-6);
+  background: var(--gray-50);
+  border-left: 2px solid var(--primary-light);
+}
 
 .schema-title {
   font-size: var(--font-size-xl);
@@ -1835,16 +1824,6 @@ body:has(#chartsContainer) .container {
   font-size: var(--font-size-base);
 }
 
-.recommendations-section {
-  flex: 1;
-  padding: var(--space-6);
-  background: var(--gray-50);
-  border-left: 3px solid var(--primary-light);
-  min-width: 450px;
-  max-width: 500px;
-  overflow-y: auto;
-  max-height: 800px;
-}
 
 .chart-controls {
   margin-bottom: var(--space-4);
