@@ -218,11 +218,12 @@ class RecommendationTemplate(models.Model):
     description = models.TextField(help_text="Описание уровня риска", verbose_name="Описание")
     recommendations = models.TextField(help_text="Подробные медицинские рекомендации", verbose_name="Рекомендации")
     
-    # Indicator-specific recommendations
+    # DEPRECATED: Keep for backward compatibility but will be replaced with IndicatorRecommendation
     indicator_recommendations = models.JSONField(
         default=dict,
-        help_text="Специфические рекомендации для каждого индикатора (JSON формат)",
-        verbose_name="Рекомендации по индикаторам"
+        help_text="УСТАРЕЛО: Используйте отдельные рекомендации по индикаторам",
+        verbose_name="Рекомендации по индикаторам (устарело)",
+        blank=True
     )
     
     created_at = models.DateTimeField(auto_now_add=True, verbose_name="Создано")
@@ -240,3 +241,49 @@ class RecommendationTemplate(models.Model):
     def is_score_in_range(self, total_score):
         """Check if a total score falls within this recommendation's range"""
         return self.min_score <= total_score <= self.max_score
+
+    def get_indicator_recommendations(self):
+        """Get indicator-specific recommendations, preferring new model over JSON"""
+        # Get from new model first
+        indicator_recs = {}
+        for rec in self.indicator_recommendations_new.all():
+            indicator_recs[rec.indicator.name] = rec.recommendation_text
+        
+        # Fall back to JSON field if no new recommendations exist
+        if not indicator_recs and self.indicator_recommendations:
+            indicator_recs = self.indicator_recommendations
+        
+        return indicator_recs
+
+
+class IndicatorRecommendation(models.Model):
+    """Рекомендация по конкретному индикатору для уровня риска"""
+    recommendation_template = models.ForeignKey(
+        RecommendationTemplate, 
+        on_delete=models.CASCADE, 
+        related_name='indicator_recommendations_new',
+        verbose_name="Шаблон рекомендаций"
+    )
+    indicator = models.ForeignKey(
+        Indicator, 
+        on_delete=models.CASCADE,
+        verbose_name="Индикатор"
+    )
+    
+    # Recommendation for different score levels
+    recommendation_text = models.TextField(
+        help_text="Рекомендация для этого индикатора при данном уровне риска",
+        verbose_name="Текст рекомендации"
+    )
+    
+    created_at = models.DateTimeField(auto_now_add=True, verbose_name="Создано")
+    updated_at = models.DateTimeField(auto_now=True, verbose_name="Обновлено")
+    
+    class Meta:
+        ordering = ['recommendation_template', 'indicator__name']
+        unique_together = ['recommendation_template', 'indicator']
+        verbose_name = "Рекомендация по индикатору"
+        verbose_name_plural = "Рекомендации по индикаторам"
+    
+    def __str__(self):
+        return f"{self.recommendation_template.get_risk_level_display()} - {self.indicator.name}"

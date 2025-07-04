@@ -1,6 +1,6 @@
 from django.contrib import admin
 from django import forms
-from .models import Schema, Indicator, ScoringRange, RecommendationTemplate
+from .models import Schema, Indicator, ScoringRange, RecommendationTemplate, IndicatorRecommendation
 
 
 class ScoringRangeForm(forms.ModelForm):
@@ -143,12 +143,36 @@ class IndicatorAdmin(admin.ModelAdmin):
     )
 
 
+class IndicatorRecommendationInline(admin.TabularInline):
+    model = IndicatorRecommendation
+    extra = 0
+    fields = ['indicator', 'recommendation_text']
+    verbose_name = "Рекомендация по индикатору"
+    verbose_name_plural = "Рекомендации по индикаторам"
+
+    def formfield_for_foreignkey(self, db_field, request, **kwargs):
+        """Filter indicators by schema"""
+        if db_field.name == "indicator":
+            # Get the recommendation template object from the URL
+            try:
+                template_id = request.resolver_match.kwargs.get('object_id')
+                if template_id:
+                    template = RecommendationTemplate.objects.get(id=template_id)
+                    kwargs["queryset"] = Indicator.objects.filter(schema=template.schema, is_active=True)
+                else:
+                    kwargs["queryset"] = Indicator.objects.filter(is_active=True)
+            except (RecommendationTemplate.DoesNotExist, ValueError):
+                kwargs["queryset"] = Indicator.objects.filter(is_active=True)
+        return super().formfield_for_foreignkey(db_field, request, **kwargs)
+
+
 @admin.register(RecommendationTemplate)
 class RecommendationTemplateAdmin(admin.ModelAdmin):
     list_display = ['schema', 'get_risk_level_display', 'min_score', 'max_score', 'title']
     list_filter = ['schema', 'risk_level']
     search_fields = ['title', 'description']
     ordering = ['schema', 'min_score']
+    inlines = [IndicatorRecommendationInline]
     
     fieldsets = (
         ('🏥 Схема и уровень риска', {
@@ -164,20 +188,37 @@ class RecommendationTemplateAdmin(admin.ModelAdmin):
             • <strong>Рекомендации:</strong> Подробные медицинские инструкции
             '''
         }),
-        ('🎯 Специфические рекомендации по индикаторам', {
-            'fields': ('indicator_recommendations',),
-            'description': '''
-            <strong>JSON формат для индикаторов:</strong><br/>
-            <code>{<br/>
-            &nbsp;&nbsp;"Курение": "Рекомендации по курению...",<br/>
-            &nbsp;&nbsp;"OHIP 14": "Рекомендации по качеству жизни...",<br/>
-            &nbsp;&nbsp;"Длительность": "Рекомендации по времени..."<br/>
-            }</code>
-            ''',
-            'classes': ('collapse',)
-        })
     )
     
     def get_risk_level_display(self, obj):
         return obj.get_risk_level_display()
     get_risk_level_display.short_description = 'Уровень риска'
+    
+    def save_model(self, request, obj, form, change):
+        """Save the recommendation template"""
+        super().save_model(request, obj, form, change)
+
+
+@admin.register(IndicatorRecommendation)
+class IndicatorRecommendationAdmin(admin.ModelAdmin):
+    list_display = ['recommendation_template', 'indicator', 'get_short_recommendation']
+    list_filter = ['recommendation_template__schema', 'recommendation_template__risk_level', 'indicator']
+    search_fields = ['indicator__name', 'recommendation_text']
+    ordering = ['recommendation_template', 'indicator__name']
+    
+    fieldsets = (
+        ('Базовая информация', {
+            'fields': ('recommendation_template', 'indicator'),
+            'description': 'Выберите шаблон рекомендации и индикатор'
+        }),
+        ('Рекомендация', {
+            'fields': ('recommendation_text',),
+            'description': 'Введите конкретную рекомендацию для этого индикатора'
+        }),
+    )
+    
+    def get_short_recommendation(self, obj):
+        """Show truncated recommendation text"""
+        text = obj.recommendation_text
+        return text[:100] + "..." if len(text) > 100 else text
+    get_short_recommendation.short_description = 'Рекомендация'
